@@ -29,5 +29,5 @@ class EvalResult(BaseModel):
     encepp_score: int
     overall_grade: Literal["A", "B", "C", "D"]
     encepp_items: list[ENCEPPItem]
-    judge_narrative: str
-    improvement_suggestions: list[ImprovementSuggestion]
+    judge_narrative: Optional[str] = None
+    improvement_suggestions: list[ImprovementSuggestion] = []
