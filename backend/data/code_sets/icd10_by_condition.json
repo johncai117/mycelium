@@ -1,0 +1,118 @@
+{
+  "rheumatoid_arthritis": {
+    "codes": [
+      {"code": "M05.9", "description": "Rheumatoid arthritis with rheumatoid factor, unspecified"},
+      {"code": "M05.00", "description": "Felty's syndrome, unspecified site"},
+      {"code": "M05.10", "description": "Rheumatoid lung disease with rheumatoid arthritis, unspecified site"},
+      {"code": "M05.30", "description": "Rheumatoid heart disease with rheumatoid arthritis, unspecified site"},
+      {"code": "M06.00", "description": "Rheumatoid arthritis without rheumatoid factor, unspecified site"},
+      {"code": "M06.9", "description": "Rheumatoid arthritis, unspecified"},
+      {"code": "M08.00", "description": "Unspecified juvenile rheumatoid arthritis, unspecified site"}
+    ],
+    "notes": "Use M05.x for seropositive RA, M06.x for seronegative RA. M06.9 is a broad catch-all."
+  },
+  "type2_diabetes": {
+    "codes": [
+      {"code": "E11.9", "description": "Type 2 diabetes mellitus without complications"},
+      {"code": "E11.65", "description": "Type 2 diabetes mellitus with hyperglycemia"},
+      {"code": "E11.40", "description": "Type 2 diabetes mellitus with diabetic neuropathy, unspecified"},
+      {"code": "E11.319", "description": "Type 2 diabetes mellitus with unspecified diabetic retinopathy without macular edema"},
+      {"code": "E11.649", "description": "Type 2 diabetes mellitus with hypoglycemia without coma"},
+      {"code": "E11.21", "description": "Type 2 diabetes mellitus with diabetic nephropathy"},
+      {"code": "E11.51", "description": "Type 2 diabetes mellitus with diabetic peripheral angiopathy without gangrene"}
+    ],
+    "notes": "E11.x is type 2 diabetes. Use E10.x for type 1. Consider requiring ≥2 outpatient or 1 inpatient code for case definition."
+  },
+  "atrial_fibrillation": {
+    "codes": [
+      {"code": "I48.0", "description": "Paroxysmal atrial fibrillation"},
+      {"code": "I48.11", "description": "Longstanding persistent atrial fibrillation"},
+      {"code": "I48.19", "description": "Other persistent atrial fibrillation"},
+      {"code": "I48.20", "description": "Chronic atrial fibrillation, unspecified"},
+      {"code": "I48.91", "description": "Unspecified atrial fibrillation"},
+      {"code": "I48.3", "description": "Typical atrial flutter"},
+      {"code": "I48.4", "description": "Atypical atrial flutter"}
+    ],
+    "notes": "I48.91 is the most commonly used unspecified code. I48.0 for paroxysmal AF. Include I48.3/I48.4 for atrial flutter if relevant."
+  },
+  "copd": {
+    "codes": [
+      {"code": "J44.0", "description": "Chronic obstructive pulmonary disease with acute lower respiratory infection"},
+      {"code": "J44.1", "description": "Chronic obstructive pulmonary disease with acute exacerbation"},
+      {"code": "J44.9", "description": "Chronic obstructive pulmonary disease, unspecified"},
+      {"code": "J43.9", "description": "Emphysema, unspecified"},
+      {"code": "J41.0", "description": "Simple chronic bronchitis"},
+      {"code": "J42", "description": "Unspecified chronic bronchitis"}
+    ],
+    "notes": "J44.x is the primary COPD code family. J44.9 is most frequently used in claims. Consider spirometry-confirmed definitions for clinical studies."
+  },
+  "asthma": {
+    "codes": [
+      {"code": "J45.20", "description": "Mild intermittent asthma, uncomplicated"},
+      {"code": "J45.30", "description": "Mild persistent asthma, uncomplicated"},
+      {"code": "J45.40", "description": "Moderate persistent asthma, uncomplicated"},
+      {"code": "J45.50", "description": "Severe persistent asthma, uncomplicated"},
+      {"code": "J45.901", "description": "Unspecified asthma with acute exacerbation"},
+      {"code": "J45.909", "description": "Unspecified asthma, uncomplicated"},
+      {"code": "J45.998", "description": "Other asthma"}
+    ],
+    "notes": "J45.909 is most common in administrative data. Severity subtyping (J45.2x–J45.5x) rarely coded consistently in claims."
+  },
+  "heart_failure": {
+    "codes": [
+      {"code": "I50.1", "description": "Left ventricular failure, unspecified"},
+      {"code": "I50.20", "description": "Unspecified systolic (congestive) heart failure"},
+      {"code": "I50.22", "description": "Chronic systolic (congestive) heart failure"},
+      {"code": "I50.30", "description": "Unspecified diastolic (congestive) heart failure"},
+      {"code": "I50.32", "description": "Chronic diastolic (congestive) heart failure"},
+      {"code": "I50.9", "description": "Heart failure, unspecified"},
+      {"code": "I50.81", "description": "Right heart failure, unspecified"}
+    ],
+    "notes": "I50.9 is broad catch-all. I50.2x for HFrEF (systolic), I50.3x for HFpEF (diastolic). Hospitalization-based definitions recommended."
+  },
+  "hypertension": {
+    "codes": [
+      {"code": "I10", "description": "Essential (primary) hypertension"},
+      {"code": "I11.9", "description": "Hypertensive heart disease without heart failure"},
+      {"code": "I12.9", "description": "Hypertensive chronic kidney disease with stage 1 through stage 4 chronic kidney disease"},
+      {"code": "I13.10", "description": "Hypertensive heart and chronic kidney disease without heart failure"},
+      {"code": "I16.0", "description": "Hypertensive urgency"},
+      {"code": "I16.1", "description": "Hypertensive emergency"}
+    ],
+    "notes": "I10 is the primary code for essential hypertension. Most prevalent chronic condition in administrative claims."
+  },
+  "chronic_kidney_disease": {
+    "codes": [
+      {"code": "N18.1", "description": "Chronic kidney disease, stage 1"},
+      {"code": "N18.2", "description": "Chronic kidney disease, stage 2 (mild)"},
+      {"code": "N18.3", "description": "Chronic kidney disease, stage 3 (moderate)"},
+      {"code": "N18.4", "description": "Chronic kidney disease, stage 4 (severe)"},
+      {"code": "N18.5", "description": "Chronic kidney disease, stage 5"},
+      {"code": "N18.6", "description": "End stage renal disease"},
+      {"code": "N18.9", "description": "Chronic kidney disease, unspecified"}
+    ],
+    "notes": "Stage-specific codes available in ICD-10. N18.6 for ESRD (dialysis/transplant eligible). Claims coding of CKD stage is often inaccurate."
+  },
+  "inflammatory_bowel_disease": {
+    "codes": [
+      {"code": "K50.00", "description": "Crohn's disease of small intestine without complications"},
+      {"code": "K50.90", "description": "Crohn's disease, unspecified, without complications"},
+      {"code": "K51.00", "description": "Ulcerative (chronic) pancolitis without complications"},
+      {"code": "K51.90", "description": "Ulcerative colitis, unspecified, without complications"},
+      {"code": "K50.10", "description": "Crohn's disease of large intestine without complications"},
+      {"code": "K52.9", "description": "Noninfective gastroenteritis and colitis, unspecified"}
+    ],
+    "notes": "K50.x = Crohn's disease, K51.x = Ulcerative colitis. Use K50.90 and K51.90 for unspecified IBD in claims studies."
+  },
+  "osteoporosis": {
+    "codes": [
+      {"code": "M81.0", "description": "Age-related osteoporosis without current pathological fracture"},
+      {"code": "M81.6", "description": "Localized osteoporosis [Lequesne]"},
+      {"code": "M80.00XA", "description": "Age-related osteoporosis with current pathological fracture, unspecified site, initial encounter"},
+      {"code": "M81.8", "description": "Other osteoporosis without current pathological fracture"},
+      {"code": "M85.80", "description": "Other specified disorders of bone density and structure, unspecified site"},
+      {"code": "Z87.310", "description": "Personal history of (healed) osteoporosis fracture"}
+    ],
+    "notes": "M81.0 for primary osteoporosis. M80.x for osteoporosis with pathological fracture. Z87.310 for history of fracture as covariate."
+  }
+}

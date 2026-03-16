@@ -1,0 +1,101 @@
+{
+  "tofacitinib": {
+    "codes": [
+      {"code": "00069-0227-30", "description": "Tofacitinib (Xeljanz) 5mg tablet, 30ct", "source": "NDC"},
+      {"code": "00069-0227-60", "description": "Tofacitinib (Xeljanz) 5mg tablet, 60ct", "source": "NDC"},
+      {"code": "00069-1234-30", "description": "Tofacitinib (Xeljanz XR) 11mg extended-release tablet, 30ct", "source": "NDC"},
+      {"code": "1815621", "description": "Tofacitinib", "source": "RxNorm CUI"},
+      {"code": "L04AA29", "description": "Tofacitinib (JAK inhibitor)", "source": "ATC"}
+    ],
+    "notes": "JAK1/JAK3 inhibitor. Approved for RA, PsA, UC, JIA. Multiple NDC codes per formulation/pack size. RxNorm preferred for cross-database studies."
+  },
+  "apixaban": {
+    "codes": [
+      {"code": "00003-0893-21", "description": "Apixaban (Eliquis) 5mg tablet, 60ct", "source": "NDC"},
+      {"code": "00003-0894-21", "description": "Apixaban (Eliquis) 2.5mg tablet, 60ct", "source": "NDC"},
+      {"code": "00003-0893-11", "description": "Apixaban (Eliquis) 5mg tablet, 14ct", "source": "NDC"},
+      {"code": "1364430", "description": "Apixaban", "source": "RxNorm CUI"},
+      {"code": "B01AF02", "description": "Apixaban (direct factor Xa inhibitor)", "source": "ATC"}
+    ],
+    "notes": "Direct oral anticoagulant (DOAC). Approved for NVAF stroke prevention, DVT/PE treatment and prophylaxis. 2.5mg BID for dose-reduced patients."
+  },
+  "rivaroxaban": {
+    "codes": [
+      {"code": "50458-0579-30", "description": "Rivaroxaban (Xarelto) 20mg tablet, 30ct", "source": "NDC"},
+      {"code": "50458-0577-30", "description": "Rivaroxaban (Xarelto) 15mg tablet, 30ct", "source": "NDC"},
+      {"code": "50458-0578-30", "description": "Rivaroxaban (Xarelto) 10mg tablet, 30ct", "source": "NDC"},
+      {"code": "1114195", "description": "Rivaroxaban", "source": "RxNorm CUI"},
+      {"code": "B01AF01", "description": "Rivaroxaban (direct factor Xa inhibitor)", "source": "ATC"}
+    ],
+    "notes": "Direct oral anticoagulant (DOAC). Multiple approved doses by indication. 20mg for NVAF, 15mg/20mg for VTE, 10mg for prophylaxis."
+  },
+  "adalimumab": {
+    "codes": [
+      {"code": "00074-3799-02", "description": "Adalimumab (Humira) 40mg/0.8mL injection, 2 syringes", "source": "NDC"},
+      {"code": "00074-9374-02", "description": "Adalimumab (Humira) 40mg/0.4mL pen, 2ct", "source": "NDC"},
+      {"code": "00074-0582-02", "description": "Adalimumab-adaz (Hyrimoz) biosimilar 40mg/0.8mL, 2ct", "source": "NDC"},
+      {"code": "327361", "description": "Adalimumab", "source": "RxNorm CUI"},
+      {"code": "L04AB04", "description": "Adalimumab (TNF-alpha inhibitor)", "source": "ATC"}
+    ],
+    "notes": "TNF-alpha inhibitor biologic. Multiple biosimilars available post-2023. Include biosimilar NDC codes for comprehensive exposure capture."
+  },
+  "semaglutide": {
+    "codes": [
+      {"code": "00169-4060-12", "description": "Semaglutide (Ozempic) 0.5mg/dose injection, 2mg/1.5mL pen", "source": "NDC"},
+      {"code": "00169-4061-12", "description": "Semaglutide (Ozempic) 1mg/dose injection, 4mg/3mL pen", "source": "NDC"},
+      {"code": "00169-4922-01", "description": "Semaglutide (Wegovy) 2.4mg/dose injection, 0.75mL pen", "source": "NDC"},
+      {"code": "00169-4175-11", "description": "Semaglutide (Rybelsus) 7mg oral tablet, 30ct", "source": "NDC"},
+      {"code": "2200349", "description": "Semaglutide", "source": "RxNorm CUI"},
+      {"code": "A10BJ06", "description": "Semaglutide (GLP-1 receptor agonist)", "source": "ATC"}
+    ],
+    "notes": "GLP-1 agonist available as SC injection (Ozempic/Wegovy) and oral tablet (Rybelsus). Distinguish by indication: T2DM vs. obesity management."
+  },
+  "metformin": {
+    "codes": [
+      {"code": "00093-1048-01", "description": "Metformin HCl 500mg tablet, 100ct", "source": "NDC"},
+      {"code": "00093-1049-01", "description": "Metformin HCl 850mg tablet, 100ct", "source": "NDC"},
+      {"code": "00093-7213-01", "description": "Metformin HCl ER 500mg tablet, 100ct", "source": "NDC"},
+      {"code": "6809", "description": "Metformin", "source": "RxNorm CUI"},
+      {"code": "A10BA02", "description": "Metformin (biguanide)", "source": "ATC"}
+    ],
+    "notes": "First-line T2DM therapy. Hundreds of NDC codes across generics. Use RxNorm ingredient code 6809 for comprehensive capture across all manufacturers."
+  },
+  "atorvastatin": {
+    "codes": [
+      {"code": "00071-0155-23", "description": "Atorvastatin (Lipitor) 20mg tablet, 90ct", "source": "NDC"},
+      {"code": "00071-0156-23", "description": "Atorvastatin (Lipitor) 40mg tablet, 90ct", "source": "NDC"},
+      {"code": "00071-0157-23", "description": "Atorvastatin (Lipitor) 80mg tablet, 90ct", "source": "NDC"},
+      {"code": "83367", "description": "Atorvastatin", "source": "RxNorm CUI"},
+      {"code": "C10AA05", "description": "Atorvastatin (HMG CoA reductase inhibitor)", "source": "ATC"}
+    ],
+    "notes": "High-intensity statin (40–80mg). Most prescribed statin globally. Heavily genericized — use RxNorm CUI 83367 for cross-database coverage."
+  },
+  "lisinopril": {
+    "codes": [
+      {"code": "00071-0134-23", "description": "Lisinopril 10mg tablet, 90ct", "source": "NDC"},
+      {"code": "00071-0135-23", "description": "Lisinopril 20mg tablet, 90ct", "source": "NDC"},
+      {"code": "00071-0136-23", "description": "Lisinopril 40mg tablet, 90ct", "source": "NDC"},
+      {"code": "29046", "description": "Lisinopril", "source": "RxNorm CUI"},
+      {"code": "C09AA03", "description": "Lisinopril (ACE inhibitor)", "source": "ATC"}
+    ],
+    "notes": "ACE inhibitor. Used for hypertension, heart failure, and post-MI. One of the most commonly prescribed medications in the US."
+  },
+  "omeprazole": {
+    "codes": [
+      {"code": "00186-0107-28", "description": "Omeprazole (Prilosec) 20mg capsule, 28ct", "source": "NDC"},
+      {"code": "00186-0107-42", "description": "Omeprazole (Prilosec) 20mg capsule, 42ct", "source": "NDC"},
+      {"code": "7646", "description": "Omeprazole", "source": "RxNorm CUI"},
+      {"code": "A02BC01", "description": "Omeprazole (proton pump inhibitor)", "source": "ATC"}
+    ],
+    "notes": "Proton pump inhibitor (PPI). Frequently used as confounder/covariate in cardiovascular and GI studies. Heavy OTC use may undercount exposure in claims."
+  },
+  "amlodipine": {
+    "codes": [
+      {"code": "00069-1520-68", "description": "Amlodipine (Norvasc) 5mg tablet, 90ct", "source": "NDC"},
+      {"code": "00069-1530-68", "description": "Amlodipine (Norvasc) 10mg tablet, 90ct", "source": "NDC"},
+      {"code": "17767", "description": "Amlodipine", "source": "RxNorm CUI"},
+      {"code": "C08CA01", "description": "Amlodipine (calcium channel blocker, dihydropyridine)", "source": "ATC"}
+    ],
+    "notes": "Dihydropyridine calcium channel blocker. Used for hypertension and angina. Common active comparator in cardiovascular PASS studies."
+  }
+}
