@@ -2,6 +2,7 @@ import { Routes, Route, Link, useLocation } from 'react-router-dom'
 import { StudyList } from './pages/StudyList'
 import { StudySetup } from './pages/StudySetup'
 import { ProtocolDraft } from './pages/ProtocolDraft'
+import { MOCK_MODE } from './api'
 
 function Nav() {
   const location = useLocation()
@@ -33,9 +34,19 @@ function Nav() {
   )
 }
 
+function MockBanner() {
+  if (!MOCK_MODE) return null
+  return (
+    <div className="bg-amber-50 border-b border-amber-200 px-4 py-2 text-center text-sm text-amber-800">
+      🧪 Demo Mode — API calls are mocked. Deploy your own backend for full functionality.
+    </div>
+  )
+}
+
 export default function App() {
   return (
     <div className="min-h-screen bg-slate-50">
+      <MockBanner />
       <Nav />
       <Routes>
         <Route path="/" element={<StudyList />} />
