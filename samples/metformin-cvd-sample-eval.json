@@ -1,0 +1,239 @@
+{
+  "encepp_score": 78,
+  "overall_grade": "C",
+  "encepp_items": [
+    {
+      "item": "Primary objective clearly stated",
+      "section": "objectives",
+      "score": 0.5,
+      "finding": "Partially addressed (matched: primary objective)."
+    },
+    {
+      "item": "PICO elements defined (Population, Intervention, Comparator, Outcome)",
+      "section": "objectives",
+      "score": 1.0,
+      "finding": "Present (matched: exposure, comparator)."
+    },
+    {
+      "item": "Study design named and described",
+      "section": "study_design",
+      "score": 0.5,
+      "finding": "Partially addressed (matched: cohort)."
+    },
+    {
+      "item": "Rationale for study design provided",
+      "section": "study_design",
+      "score": 0.5,
+      "finding": "Partially addressed (matched: suitable)."
+    },
+    {
+      "item": "New-user design documented (if applicable)",
+      "section": "cohort_definition",
+      "score": 1.0,
+      "finding": "Present (matched: new-user, incident user)."
+    },
+    {
+      "item": "Database/data source described",
+      "section": "study_setting",
+      "score": 1.0,
+      "finding": "Present (matched: database, claims)."
+    },
+    {
+      "item": "Database coverage and population described",
+      "section": "study_setting",
+      "score": 0.5,
+      "finding": "Partially addressed (matched: patients)."
+    },
+    {
+      "item": "Study time period specified",
+      "section": "study_setting",
+      "score": 1.0,
+      "finding": "Present (matched: from, between)."
+    },
+    {
+      "item": "Geographic coverage specified",
+      "section": "study_setting",
+      "score": 0.5,
+      "finding": "Partially addressed (matched: us )."
+    },
+    {
+      "item": "Drug exposure defined with code list",
+      "section": "variables",
+      "score": 1.0,
+      "finding": "Present (matched: ndc, drug code)."
+    },
+    {
+      "item": "Index date logic specified",
+      "section": "cohort_definition",
+      "score": 1.0,
+      "finding": "Present (matched: index date, initiation)."
+    },
+    {
+      "item": "Washout period defined",
+      "section": "cohort_definition",
+      "score": 0.5,
+      "finding": "Partially addressed (matched: washout)."
+    },
+    {
+      "item": "New-user/incident-user criteria stated",
+      "section": "cohort_definition",
+      "score": 1.0,
+      "finding": "Present (matched: incident, washout period)."
+    },
+    {
+      "item": "Primary outcome defined",
+      "section": "variables",
+      "score": 1.0,
+      "finding": "Present (matched: primary outcome, outcome of interest)."
+    },
+    {
+      "item": "Outcome validated with code list (ICD/CPT)",
+      "section": "variables",
+      "score": 1.0,
+      "finding": "Present (matched: icd, icd-10)."
+    },
+    {
+      "item": "Secondary outcomes listed",
+      "section": "variables",
+      "score": 0.5,
+      "finding": "Partially addressed (matched: secondary outcome)."
+    },
+    {
+      "item": "Confounder list specified",
+      "section": "variables",
+      "score": 1.0,
+      "finding": "Present (matched: confounder, covariate)."
+    },
+    {
+      "item": "Baseline period for covariate assessment defined",
+      "section": "cohort_definition",
+      "score": 0.0,
+      "finding": "Not found. Consider adding explicit language."
+    },
+    {
+      "item": "Source of covariate data described",
+      "section": "study_setting",
+      "score": 0.0,
+      "finding": "Not found. Consider adding explicit language."
+    },
+    {
+      "item": "Primary analysis method named",
+      "section": "data_analysis",
+      "score": 1.0,
+      "finding": "Present (matched: cox, propensity score)."
+    },
+    {
+      "item": "Confounding adjustment method described",
+      "section": "data_analysis",
+      "score": 1.0,
+      "finding": "Present (matched: propensity score, iptw)."
+    },
+    {
+      "item": "Sensitivity analyses planned",
+      "section": "data_analysis",
+      "score": 1.0,
+      "finding": "Present (matched: sensitivity analysis, sensitivity analyses)."
+    },
+    {
+      "item": "Selection bias discussed",
+      "section": "limitations",
+      "score": 1.0,
+      "finding": "Present (matched: selection bias, selection)."
+    },
+    {
+      "item": "Information bias / misclassification discussed",
+      "section": "limitations",
+      "score": 1.0,
+      "finding": "Present (matched: misclassification, information bias)."
+    },
+    {
+      "item": "Confounding discussed",
+      "section": "limitations",
+      "score": 1.0,
+      "finding": "Present (matched: confounding, unmeasured confound)."
+    },
+    {
+      "item": "Generalizability addressed",
+      "section": "limitations",
+      "score": 1.0,
+      "finding": "Present (matched: generalizability, representativeness)."
+    },
+    {
+      "item": "IRB/ethics board statement included",
+      "section": "ethics",
+      "score": 0.5,
+      "finding": "Partially addressed (matched: institutional review board)."
+    },
+    {
+      "item": "Data use agreement / data privacy addressed",
+      "section": "ethics",
+      "score": 1.0,
+      "finding": "Present (matched: data use agreement, dua)."
+    },
+    {
+      "item": "Informed consent statement included",
+      "section": "ethics",
+      "score": 0.5,
+      "finding": "Partially addressed (matched: informed consent)."
+    }
+  ],
+  "judge_narrative": "The protocol demonstrates a strong alignment with ENCePP principles, particularly regarding the active comparator cohort design, the use of de-identified data, and the pre-specification of statistical methods to mitigate bias. The inclusion of robustness checks like high-dimensional propensity scores (hdPS), negative control outcomes, and inverse probability weighting reflects a sophisticated approach to addressing confounding and immortal time bias. However, the protocol lacks explicit justification for the chosen sample size calculation, relying instead on a qualitative assertion of 'large denominator' sufficiency, which is insufficient for rigorous ENCePP evaluation. Additionally, the sensitivity analysis section relies heavily on complex modeling techniques (e.g., IPTW) without specifying handling for unmeasured time-varying confounders, a key ENCePP requirement.",
+  "improvement_suggestions": [
+    {
+      "section": "Statistical Methods / Sample Size",
+      "suggestion": "Include a formal sample size calculation or justification based on expected event rates (using Poisson distribution approximations) to explicitly demonstrate that the cohort size is adequate to detect a clinically meaningful hazard ratio (e.g., HR=1.2) with 80% power and a specific alpha level, rather than just citing a desired confidence interval width."
+    },
+    {
+      "section": "Sensitivity Analyses",
+      "suggestion": "Clarify the strategy for handling time-varying confounders (e.g., changes in comorbidity status or concomitant medications over time). Consider specifying whether marginal structural models or dynamic IPTW will be used, as static covariate adjustment in Cox models may not fully address time-dependent confounding."
+    },
+    {
+      "section": "Data Collection",
+      "suggestion": "Address the limitations of the 180-day washout period more explicitly. Explain how this specific duration was determined and provide evidence that it does not inadvertently exclude high-risk patients in a way that introduces selection bias, potentially citing literature on the typical time to MACE onset in this population."
+    },
+    {
+      "section": "objectives",
+      "suggestion": "Improve 'Primary objective clearly stated': Partially addressed (matched: primary objective)."
+    },
+    {
+      "section": "study_design",
+      "suggestion": "Improve 'Study design named and described': Partially addressed (matched: cohort)."
+    },
+    {
+      "section": "study_design",
+      "suggestion": "Improve 'Rationale for study design provided': Partially addressed (matched: suitable)."
+    },
+    {
+      "section": "study_setting",
+      "suggestion": "Improve 'Database coverage and population described': Partially addressed (matched: patients)."
+    },
+    {
+      "section": "study_setting",
+      "suggestion": "Improve 'Geographic coverage specified': Partially addressed (matched: us )."
+    },
+    {
+      "section": "cohort_definition",
+      "suggestion": "Improve 'Washout period defined': Partially addressed (matched: washout)."
+    },
+    {
+      "section": "variables",
+      "suggestion": "Improve 'Secondary outcomes listed': Partially addressed (matched: secondary outcome)."
+    },
+    {
+      "section": "cohort_definition",
+      "suggestion": "Improve 'Baseline period for covariate assessment defined': Not found. Consider adding explicit language."
+    },
+    {
+      "section": "study_setting",
+      "suggestion": "Improve 'Source of covariate data described': Not found. Consider adding explicit language."
+    },
+    {
+      "section": "ethics",
+      "suggestion": "Improve 'IRB/ethics board statement included': Partially addressed (matched: institutional review board)."
+    },
+    {
+      "section": "ethics",
+      "suggestion": "Improve 'Informed consent statement included': Partially addressed (matched: informed consent)."
+    }
+  ]
+}
