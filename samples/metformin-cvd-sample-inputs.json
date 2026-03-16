@@ -1,0 +1,14 @@
+{
+  "study_title": "Risk of cardiovascular events in patients initiating metformin vs sulfonylureas",
+  "drug_name": "Metformin",
+  "indication": "Type 2 diabetes",
+  "study_type": "cohort",
+  "data_source": "UK Clinical Practice Research Datalink",
+  "primary_outcome": "Major adverse cardiovascular events (MACE)",
+  "follow_up_years": 3,
+  "_meta": {
+    "generated_at": "2026-03-16",
+    "model": "qwen3.5:9b (Ollama, local)",
+    "backend_version": "Phase 1 MVP"
+  }
+}
