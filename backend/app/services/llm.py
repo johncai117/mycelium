@@ -1,10 +1,9 @@
 import json
 import time
 import logging
+import urllib.request
 from pathlib import Path
 from typing import Optional
-
-import anthropic
 
 from app.models.study_input import StudyInput
 from app.models.protocol import Protocol
@@ -12,7 +11,8 @@ from app.models.eval_result import JudgeResult, ImprovementSuggestion
 
 logger = logging.getLogger(__name__)
 
-MODEL = "claude-sonnet-4-6"
+MODEL = "qwen3.5:9b"
+OLLAMA_BASE_URL = "http://localhost:11434"
 PROMPTS_DIR = Path(__file__).parent.parent / "prompts"
 
 
@@ -23,27 +23,47 @@ def _load_prompt(name: str) -> str:
     return ""
 
 
-def _call_with_backoff(fn, max_retries: int = 4):
-    """Call fn with exponential backoff on rate limit errors."""
+def _call_with_backoff(fn, max_retries: int = 3):
+    """Call fn with simple retry on transient errors."""
     for attempt in range(max_retries):
         try:
             return fn()
-        except anthropic.RateLimitError:
+        except Exception as e:
             if attempt == max_retries - 1:
                 raise
             wait = 2 ** attempt
-            logger.warning(f"Rate limited, retrying in {wait}s...")
+            logger.warning(f"LLM call failed ({e}), retrying in {wait}s...")
             time.sleep(wait)
-        except anthropic.APIStatusError as e:
-            if e.status_code == 529 and attempt < max_retries - 1:
-                time.sleep(2 ** attempt)
-            else:
-                raise
 
 
 class LLMService:
     def __init__(self):
-        self.client = anthropic.Anthropic()
+        self.base_url = OLLAMA_BASE_URL
+
+    def _chat(self, system: str, user: str, max_tokens: int = 2048) -> str:
+        """Call Ollama native API with think=false to get direct output."""
+        def call():
+            payload = json.dumps({
+                "model": MODEL,
+                "think": False,
+                "stream": False,
+                "options": {"num_predict": max_tokens},
+                "messages": [
+                    {"role": "system", "content": system},
+                    {"role": "user", "content": user},
+                ],
+            }).encode("utf-8")
+
+            req = urllib.request.Request(
+                f"{self.base_url}/api/chat",
+                data=payload,
+                headers={"Content-Type": "application/json"},
+            )
+            with urllib.request.urlopen(req, timeout=300) as resp:
+                data = json.loads(resp.read())
+                return data["message"]["content"]
+
+        return _call_with_backoff(call)
 
     def generate_section(
         self,
@@ -78,16 +98,7 @@ Generate the {section_name.replace("_", " ").title()} section of the epidemiolog
 Write in formal regulatory language. Do not use bullet points — write flowing paragraphs.
 </instructions>"""
 
-        def call():
-            message = self.client.messages.create(
-                model=MODEL,
-                max_tokens=2048,
-                system=system_prompt,
-                messages=[{"role": "user", "content": user_message}],
-            )
-            return message.content[0].text
-
-        return _call_with_backoff(call)
+        return self._chat(system_prompt, user_message, max_tokens=2048)
 
     def clarify_inputs(self, study_inputs: StudyInput) -> list[dict]:
         system_prompt = _load_prompt("clarify")
@@ -107,17 +118,7 @@ Return a JSON array of clarifying questions for any gaps. Each question must hav
 Return ONLY valid JSON array, no other text.
 </instructions>"""
 
-        def call():
-            message = self.client.messages.create(
-                model=MODEL,
-                max_tokens=1024,
-                system=system_prompt,
-                messages=[{"role": "user", "content": user_message}],
-            )
-            return message.content[0].text
-
-        raw = _call_with_backoff(call)
-        # Strip markdown code fences if present
+        raw = self._chat(system_prompt, user_message, max_tokens=1024)
         raw = raw.strip()
         if raw.startswith("```"):
             raw = raw.split("```")[1]
@@ -148,16 +149,7 @@ Return a JSON object with:
 Return ONLY valid JSON, no other text.
 </instructions>"""
 
-        def call():
-            message = self.client.messages.create(
-                model=MODEL,
-                max_tokens=2048,
-                system=system_prompt,
-                messages=[{"role": "user", "content": user_message}],
-            )
-            return message.content[0].text
-
-        raw = _call_with_backoff(call)
+        raw = self._chat(system_prompt, user_message, max_tokens=2048)
         raw = raw.strip()
         if raw.startswith("```"):
             raw = raw.split("```")[1]
@@ -206,13 +198,4 @@ Preserve what was good in the current draft. Address the specific feedback.
 Write in formal regulatory language. Do not use bullet points — write flowing paragraphs.
 </instructions>"""
 
-        def call():
-            message = self.client.messages.create(
-                model=MODEL,
-                max_tokens=2048,
-                system=system_prompt,
-                messages=[{"role": "user", "content": user_message}],
-            )
-            return message.content[0].text
-
-        return _call_with_backoff(call)
+        return self._chat(system_prompt, user_message, max_tokens=2048)
