@@ -156,17 +156,17 @@ export function ProtocolSectionView({
           {section.status !== 'approved' && (
             <button
               onClick={handleApprove}
-              className="rounded-full border border-green-300 px-2 py-0.5 text-xs font-medium text-green-700 hover:bg-green-50"
+              className="rounded-md bg-green-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-green-700 flex items-center gap-1"
             >
-              <Check className="inline h-3 w-3 mr-0.5" />Approve
+              <Check className="h-3 w-3" />Approve
             </button>
           )}
           {!editing && (
             <button
               onClick={handleEdit}
-              className="rounded-full border border-slate-300 px-2 py-0.5 text-xs font-medium text-slate-600 hover:bg-slate-50"
+              className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 hover:border-slate-400 flex items-center gap-1"
             >
-              <Edit2 className="inline h-3 w-3 mr-0.5" />Edit
+              <Edit2 className="h-3 w-3" />Edit
             </button>
           )}
         </div>
