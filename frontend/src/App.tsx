@@ -2,6 +2,7 @@ import { Routes, Route, Link, useLocation } from 'react-router-dom'
 import { StudyList } from './pages/StudyList'
 import { StudySetup } from './pages/StudySetup'
 import { ProtocolDraft } from './pages/ProtocolDraft'
+import { HowItWorks } from './pages/HowItWorks'
 import { MOCK_MODE } from './api'
 
 function Nav() {
@@ -28,6 +29,14 @@ function Nav() {
           >
             Studies
           </Link>
+          <Link
+            to="/how-it-works"
+            className={`font-medium transition-colors ${
+              location.pathname === '/how-it-works' ? 'text-blue-600' : 'text-slate-500 hover:text-slate-700'
+            }`}
+          >
+            Guide
+          </Link>
         </nav>
       </div>
     </header>
@@ -52,6 +61,7 @@ export default function App() {
         <Route path="/" element={<StudyList />} />
         <Route path="/study/new" element={<StudySetup />} />
         <Route path="/study/:id/draft" element={<ProtocolDraft />} />
+        <Route path="/how-it-works" element={<HowItWorks />} />
       </Routes>
     </div>
   )
