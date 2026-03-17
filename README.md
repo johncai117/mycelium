@@ -220,3 +220,4 @@ See `PLAN.md` for the full architecture document.
 | PDF Parsing | PyMuPDF + pdfplumber fallback |
 | DOCX Export | python-docx |
 | Auth/Storage | Supabase (production) |
+
