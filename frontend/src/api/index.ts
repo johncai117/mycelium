@@ -455,13 +455,3 @@ export function saveProtocol(protocol: Protocol): void {
   saveStudies(studies)
   saveProtocols(protocols)
 }
-
-export function updateStudyStatus(id: string, status: StudyListItem['status']): void {
-  const studies = loadStudies()
-  const idx = studies.findIndex((s) => s.id === id)
-  if (idx >= 0) {
-    studies[idx].status = status
-    studies[idx].updated_at = new Date().toISOString()
-    saveStudies(studies)
-  }
-}
