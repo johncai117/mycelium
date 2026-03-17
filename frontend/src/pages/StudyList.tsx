@@ -1,7 +1,9 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Plus, FileText, Clock } from 'lucide-react'
 import { getStudies } from '@/api'
 import type { StudyListItem } from '@/types'
+import { OnboardingModal } from '@/components/shared/OnboardingModal'
 
 function StatusBadge({ status }: { status: StudyListItem['status'] }) {
   const styles = {
@@ -39,8 +41,13 @@ function EmptyState({ onNew }: { onNew: () => void }) {
 export function StudyList() {
   const navigate = useNavigate()
   const studies = getStudies()
+  const [showOnboarding, setShowOnboarding] = useState(
+    () => !localStorage.getItem('onboarding_seen')
+  )
 
   return (
+    <>
+    {showOnboarding && <OnboardingModal onClose={() => setShowOnboarding(false)} />}
     <div className="max-w-5xl mx-auto px-6 py-8">
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -109,5 +116,6 @@ export function StudyList() {
         </div>
       )}
     </div>
+    </>
   )
 }
