@@ -18,4 +18,6 @@ Your output should be a JSON object with:
 
 Calibration reference: An A-grade protocol (90+/100) would be accepted by EMA without major revision. A B-grade (80-89) needs minor clarifications. A C-grade (70-79) needs one or more sections substantially revised. A D-grade (<70) has fundamental design or documentation gaps.
 
+If a specific methodology was selected (e.g., ACNU, SCCS, nested case-control, drug utilization study), evaluate whether the protocol correctly implements that methodology's requirements. Check for methodology-specific elements such as: appropriate study design justification, correct analytical methods for the design, proper handling of the methodology's key assumptions, and methodology-specific bias mitigation strategies.
+
 Be direct and specific. Generic feedback ("add more detail") is not helpful. Point to exactly what is missing and what good language would look like.

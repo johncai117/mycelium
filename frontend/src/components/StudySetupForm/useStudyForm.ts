@@ -2,7 +2,13 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import type { StudyInput, ClarifyQuestion } from '@/types'
+import type {
+  StudyInput,
+  ClarifyQuestion,
+  MethodologyRecommendation,
+  MethodologyCategory,
+  MethodologyConfidence,
+} from '@/types'
 
 export const studyInputSchema = z.object({
   drug_name: z.string().min(1, 'Drug name is required'),
@@ -22,6 +28,15 @@ export const studyInputSchema = z.object({
   washout_days: z.number().min(0).optional(),
   new_user_design: z.boolean().optional(),
   clinical_context: z.string().optional(),
+  methodology: z.string().optional(),
+  methodology_confidence: z.enum(['recommended', 'user_selected', 'overridden']).optional(),
+  research_question_type: z.enum([
+    'safety_signal', 'drug_utilization', 'effectiveness',
+    'risk_minimization', 'pregnancy_safety', 'other',
+  ]).optional(),
+  outcome_rarity: z.enum(['common', 'uncommon', 'rare', 'very_rare']).optional(),
+  data_collection: z.enum(['claims_ehr', 'registry', 'survey', 'prospective']).optional(),
+  time_horizon: z.enum(['acute', 'subacute', 'chronic']).optional(),
 })
 
 export type StudyFormValues = z.infer<typeof studyInputSchema>
@@ -31,6 +46,12 @@ export function useStudyForm() {
   const [clarifyQuestions, setClarifyQuestions] = useState<ClarifyQuestion[]>([])
   const [isSufficient, setIsSufficient] = useState(false)
   const [clarifyAnswers, setClarifyAnswers] = useState<Record<string, string>>({})
+  const [methodologyRecommendation, setMethodologyRecommendation] =
+    useState<MethodologyRecommendation | null>(null)
+  const [selectedMethodology, setSelectedMethodology] =
+    useState<MethodologyCategory | null>(null)
+  const [methodologyConfidence, setMethodologyConfidence] =
+    useState<MethodologyConfidence | null>(null)
 
   const form = useForm<StudyFormValues>({
     resolver: zodResolver(studyInputSchema),
@@ -55,7 +76,20 @@ export function useStudyForm() {
         ;(merged as unknown as Record<string, unknown>)[field] = answer
       }
     }
+    // Apply methodology selection
+    if (selectedMethodology) {
+      merged.methodology = selectedMethodology
+      merged.methodology_confidence = methodologyConfidence ?? 'recommended'
+    }
     return merged
+  }
+
+  const selectMethodology = (
+    methodology: MethodologyCategory,
+    confidence: MethodologyConfidence,
+  ) => {
+    setSelectedMethodology(methodology)
+    setMethodologyConfidence(confidence)
   }
 
   const requiredQuestionsAnswered = clarifyQuestions
@@ -76,5 +110,9 @@ export function useStudyForm() {
     setClarifyAnswers,
     getStudyInputs,
     requiredQuestionsAnswered,
+    methodologyRecommendation,
+    setMethodologyRecommendation,
+    selectedMethodology,
+    selectMethodology,
   }
 }

@@ -8,6 +8,7 @@ from typing import Optional
 from app.models.study_input import StudyInput
 from app.models.protocol import Protocol
 from app.models.eval_result import JudgeResult, ImprovementSuggestion
+from app.models.methodology import METHODOLOGY_REGISTRY, MethodologyCategory
 
 logger = logging.getLogger(__name__)
 
@@ -72,6 +73,7 @@ class LLMService:
         retrieved_chunks: list[dict],
         system_prompt: str,
         prior_sections: Optional[dict] = None,
+        section_display_label: Optional[str] = None,
     ) -> str:
         chunks_text = "\n\n".join(
             f"[Source: {c.get('source_title', 'Unknown')}]\n{c.get('chunk', '')}"
@@ -83,10 +85,28 @@ class LLMService:
                 f"<{k}>\n{v}\n</{k}>" for k, v in prior_sections.items()
             )
 
+        methodology_context = ""
+        if study_inputs.methodology:
+            try:
+                cat = MethodologyCategory(study_inputs.methodology)
+                profile = METHODOLOGY_REGISTRY[cat]
+                methodology_context = f"""
+<methodology_context>
+<methodology_name>{profile.display_name}</methodology_name>
+<methodology_description>{profile.description}</methodology_description>
+<key_assumptions>{profile.key_assumptions}</key_assumptions>
+<typical_analysis>{profile.typical_analysis}</typical_analysis>
+<confounding_approach>{profile.confounding_approach}</confounding_approach>
+</methodology_context>"""
+            except (ValueError, KeyError):
+                pass
+
+        label = section_display_label or section_name.replace("_", " ").title()
+
         user_message = f"""<study_inputs>
 {study_inputs.model_dump_json(indent=2)}
 </study_inputs>
-
+{methodology_context}
 <reference_protocols>
 {chunks_text or "No reference protocols retrieved."}
 </reference_protocols>
@@ -94,7 +114,7 @@ class LLMService:
 {"<prior_sections>" + prior_text + "</prior_sections>" if prior_text else ""}
 
 <instructions>
-Generate the {section_name.replace("_", " ").title()} section of the epidemiological study protocol.
+Generate the {label} section of the epidemiological study protocol.
 Write in formal regulatory language. Do not use bullet points — write flowing paragraphs.
 </instructions>"""
 
