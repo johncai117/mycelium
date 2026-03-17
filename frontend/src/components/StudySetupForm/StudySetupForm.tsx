@@ -7,6 +7,7 @@ import { Step3ClinicalContext } from './Step3ClinicalContext'
 import { Step4FollowUpQuestions } from './Step4FollowUpQuestions'
 import { clarifyInputs } from '@/api'
 import type { StudyInput } from '@/types'
+import { EXAMPLE_STUDY_INPUT } from '@/data/exampleStudies'
 
 const STEPS = [
   { number: 1, label: 'Core Inputs' },
@@ -77,6 +78,18 @@ export function StudySetupForm({ onSubmit, isGenerating }: Props) {
 
   return (
     <div className="max-w-2xl mx-auto">
+      {/* Load example study */}
+      <div className="flex items-center gap-3 mb-6">
+        <button
+          type="button"
+          onClick={() => form.reset(EXAMPLE_STUDY_INPUT)}
+          className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+        >
+          📋 Load example study
+        </button>
+        <span className="text-xs text-slate-500">Loads a pre-filled semaglutide cardiovascular outcomes study</span>
+      </div>
+
       {/* Progress indicator */}
       <div className="flex items-center justify-between mb-8">
         {STEPS.map((step, i) => (
