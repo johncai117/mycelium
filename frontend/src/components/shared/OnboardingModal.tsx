@@ -17,7 +17,7 @@ export function OnboardingModal({ onClose }: OnboardingModalProps) {
         drug_name: p.study_inputs.drug_name,
         indication: p.study_inputs.indication,
         study_type: p.study_inputs.study_type,
-        status: 'drafting' as const,
+        status: 'review' as const,
         updated_at: p.updated_at,
         sponsor: p.study_inputs.sponsor,
       }))

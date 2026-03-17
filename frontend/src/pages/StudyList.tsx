@@ -92,8 +92,13 @@ export function StudyList() {
                       {study.study_type.replace('_', '-')}
                     </span>
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3 flex items-center gap-2">
                     <StatusBadge status={study.status} />
+                    {study.id.startsWith('demo-') && (
+                      <span className="rounded-full bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-700">
+                        Sample
+                      </span>
+                    )}
                   </td>
                   <td className="px-4 py-3">
                     <span className="flex items-center gap-1 text-xs text-slate-400">
