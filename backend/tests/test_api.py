@@ -5,13 +5,17 @@ Run with: pytest backend/tests/ -v
 (from repo root, with venv activated)
 """
 
+import os
 import json
 import pytest
 from fastapi.testclient import TestClient
 
+os.environ.setdefault("DEMO_API_KEY", "test-key")
+
 from app.main import app
 
 client = TestClient(app)
+AUTH = {"Authorization": "Bearer test-key"}
 
 # ── Sample study input ────────────────────────────────────────────────────────
 
@@ -41,7 +45,7 @@ SAMPLE_INPUT = {
 # ── Health check ─────────────────────────────────────────────────────────────
 
 def test_health():
-    response = client.get("/health")
+    response = client.get("/health", headers=AUTH)
     assert response.status_code == 200
     assert response.json() == {"status": "ok"}
 
@@ -50,7 +54,7 @@ def test_health():
 
 def test_clarify_complete_inputs():
     """When all required fields are provided, should return is_sufficient=True."""
-    response = client.post("/clarify", json={"study_inputs": SAMPLE_INPUT})
+    response = client.post("/clarify", json={"study_inputs": SAMPLE_INPUT}, headers=AUTH)
     assert response.status_code == 200
     data = response.json()
     assert "is_sufficient" in data
@@ -63,7 +67,7 @@ def test_clarify_complete_inputs():
 def test_clarify_missing_data_source():
     """Missing data_source should trigger a required clarifying question."""
     inputs = {**SAMPLE_INPUT, "data_source": None}
-    response = client.post("/clarify", json={"study_inputs": inputs})
+    response = client.post("/clarify", json={"study_inputs": inputs}, headers=AUTH)
     assert response.status_code == 200
     data = response.json()
     assert data["is_sufficient"] is False
@@ -74,7 +78,7 @@ def test_clarify_missing_data_source():
 def test_clarify_missing_primary_outcome():
     """Missing primary_outcome should trigger a required clarifying question."""
     inputs = {**SAMPLE_INPUT, "primary_outcome": None}
-    response = client.post("/clarify", json={"study_inputs": inputs})
+    response = client.post("/clarify", json={"study_inputs": inputs}, headers=AUTH)
     assert response.status_code == 200
     data = response.json()
     assert data["is_sufficient"] is False
@@ -85,7 +89,7 @@ def test_clarify_missing_primary_outcome():
 def test_clarify_cohort_missing_comparators():
     """Cohort study missing comparators should trigger a required question."""
     inputs = {**SAMPLE_INPUT, "comparators": None}
-    response = client.post("/clarify", json={"study_inputs": inputs})
+    response = client.post("/clarify", json={"study_inputs": inputs}, headers=AUTH)
     assert response.status_code == 200
     data = response.json()
     fields = [q["field"] for q in data["questions"]]
@@ -95,7 +99,7 @@ def test_clarify_cohort_missing_comparators():
 def test_clarify_short_clinical_context():
     """Short/missing clinical_context should trigger an optional question."""
     inputs = {**SAMPLE_INPUT, "clinical_context": "short"}
-    response = client.post("/clarify", json={"study_inputs": inputs})
+    response = client.post("/clarify", json={"study_inputs": inputs}, headers=AUTH)
     assert response.status_code == 200
     data = response.json()
     optional_qs = [q for q in data["questions"] if not q["required"]]
@@ -110,7 +114,7 @@ def test_retrieve_returns_list():
     Retrieve should return a list (possibly empty if ChromaDB not populated).
     Should not error out if ChromaDB is unavailable.
     """
-    response = client.post("/retrieve", json={"study_inputs": SAMPLE_INPUT})
+    response = client.post("/retrieve", json={"study_inputs": SAMPLE_INPUT}, headers=AUTH)
     assert response.status_code == 200
     data = response.json()
     assert isinstance(data, list)
@@ -121,7 +125,7 @@ def test_retrieve_returns_list():
 def test_create_and_get_study():
     """Create a study, then retrieve it by ID."""
     # Create
-    create_resp = client.post("/studies", json={"study_inputs": SAMPLE_INPUT})
+    create_resp = client.post("/studies", json={"study_inputs": SAMPLE_INPUT}, headers=AUTH)
     assert create_resp.status_code == 201
     study = create_resp.json()
     assert "id" in study
@@ -131,7 +135,7 @@ def test_create_and_get_study():
     study_id = study["id"]
 
     # Get
-    get_resp = client.get(f"/studies/{study_id}")
+    get_resp = client.get(f"/studies/{study_id}", headers=AUTH)
     assert get_resp.status_code == 200
     protocol = get_resp.json()
     assert protocol["study_id"] == study_id
@@ -141,12 +145,12 @@ def test_create_and_get_study():
 def test_list_studies():
     """Create a study and verify it appears in the list."""
     # Create a study first
-    create_resp = client.post("/studies", json={"study_inputs": SAMPLE_INPUT})
+    create_resp = client.post("/studies", json={"study_inputs": SAMPLE_INPUT}, headers=AUTH)
     assert create_resp.status_code == 201
     study_id = create_resp.json()["id"]
 
     # List
-    list_resp = client.get("/studies")
+    list_resp = client.get("/studies", headers=AUTH)
     assert list_resp.status_code == 200
     studies = list_resp.json()
     assert isinstance(studies, list)
@@ -156,29 +160,29 @@ def test_list_studies():
 
 def test_get_nonexistent_study():
     """Should return 404 for an unknown study_id."""
-    response = client.get("/studies/00000000-0000-0000-0000-000000000000")
+    response = client.get("/studies/00000000-0000-0000-0000-000000000000", headers=AUTH)
     assert response.status_code == 404
 
 
 def test_update_study():
     """Update study inputs for an existing study."""
     # Create
-    create_resp = client.post("/studies", json={"study_inputs": SAMPLE_INPUT})
+    create_resp = client.post("/studies", json={"study_inputs": SAMPLE_INPUT}, headers=AUTH)
     study_id = create_resp.json()["id"]
 
     # Update
     updated = {**SAMPLE_INPUT, "sponsor": "Pfizer Updated"}
-    update_resp = client.put(f"/studies/{study_id}", json={"study_inputs": updated})
+    update_resp = client.put(f"/studies/{study_id}", json={"study_inputs": updated}, headers=AUTH)
     assert update_resp.status_code == 200
     assert update_resp.json()["study_inputs"]["sponsor"] == "Pfizer Updated"
 
 
 def test_study_versions():
     """Version history endpoint should return at least one version."""
-    create_resp = client.post("/studies", json={"study_inputs": SAMPLE_INPUT})
+    create_resp = client.post("/studies", json={"study_inputs": SAMPLE_INPUT}, headers=AUTH)
     study_id = create_resp.json()["id"]
 
-    versions_resp = client.get(f"/studies/{study_id}/versions")
+    versions_resp = client.get(f"/studies/{study_id}/versions", headers=AUTH)
     assert versions_resp.status_code == 200
     versions = versions_resp.json()
     assert len(versions) >= 1
@@ -204,7 +208,7 @@ def test_eval_empty_protocol():
         "updated_at": datetime.utcnow().isoformat(),
     }
 
-    response = client.post("/eval", json={"protocol": protocol_dict})
+    response = client.post("/eval", json={"protocol": protocol_dict}, headers=AUTH)
     assert response.status_code == 200
     data = response.json()
     assert "encepp_score" in data
@@ -284,7 +288,7 @@ def test_eval_with_content():
         "updated_at": datetime.utcnow().isoformat(),
     }
 
-    response = client.post("/eval", json={"protocol": protocol_dict})
+    response = client.post("/eval", json={"protocol": protocol_dict}, headers=AUTH)
     assert response.status_code == 200
     data = response.json()
     assert data["encepp_score"] > 0
@@ -331,7 +335,7 @@ def test_export_docx():
         "updated_at": datetime.utcnow().isoformat(),
     }
 
-    response = client.post("/export/docx", json={"protocol": protocol_dict})
+    response = client.post("/export/docx", json={"protocol": protocol_dict}, headers=AUTH)
     assert response.status_code == 200
     assert response.headers["content-type"] == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     assert len(response.content) > 1000  # should be a non-trivial file
