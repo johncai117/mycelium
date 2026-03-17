@@ -3,9 +3,8 @@ import react from '@vitejs/plugin-react'
 import path from 'path'
 
 export default defineConfig({
-  base: process.env.VITE_BASE_URL || '/',
+  base: '/',
   plugins: [react()],
-  base: '/mycelium/',
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
@@ -13,12 +12,5 @@ export default defineConfig({
   },
   server: {
     port: 5173,
-    proxy: {
-      '/api': {
-        target: 'http://localhost:8000',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
-      },
-    },
   },
 })
