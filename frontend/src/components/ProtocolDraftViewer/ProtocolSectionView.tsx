@@ -18,12 +18,19 @@ const SECTION_TITLES: Record<string, string> = {
 
 function ConfidenceBadge({ level }: { level: string }) {
   const colors = {
-    high: 'bg-green-100 text-green-700 border-green-200',
-    medium: 'bg-yellow-100 text-yellow-700 border-yellow-200',
-    low: 'bg-orange-100 text-orange-700 border-orange-200',
+    high: 'text-green-700',
+    medium: 'text-yellow-700',
+    low: 'text-orange-700',
   }
+  const dots = {
+    high: 'bg-green-500',
+    medium: 'bg-yellow-500',
+    low: 'bg-orange-500',
+  }
+  const l = level as keyof typeof colors
   return (
-    <span className={`rounded-full border px-2 py-0.5 text-xs font-medium ${colors[level as keyof typeof colors] ?? colors.medium}`}>
+    <span className={`inline-flex items-center gap-1 text-xs ${colors[l] ?? colors.medium}`}>
+      <span className={`h-1.5 w-1.5 rounded-full ${dots[l] ?? dots.medium}`} />
       {level} confidence
     </span>
   )
@@ -31,14 +38,14 @@ function ConfidenceBadge({ level }: { level: string }) {
 
 function StatusBadge({ status }: { status?: string }) {
   const map = {
-    approved: 'bg-green-100 text-green-700',
-    edited: 'bg-blue-100 text-blue-700',
-    ai_generated: 'bg-slate-100 text-slate-600',
+    approved: 'text-green-700',
+    edited: 'text-blue-700',
+    ai_generated: 'text-slate-500',
   }
   const label = { approved: 'Approved', edited: 'Edited', ai_generated: 'AI-generated' }
   const s = (status ?? 'ai_generated') as keyof typeof map
   return (
-    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${map[s]}`}>
+    <span className={`text-xs ${map[s]}`}>
       {label[s]}
     </span>
   )
@@ -145,47 +152,57 @@ export function ProtocolSectionView({
 
   return (
     <div id={`section-${sectionKey}`} className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-      {/* Header */}
-      <div className="flex items-start justify-between gap-3 mb-4">
+      {/* Header row: title + action group */}
+      <div className="flex items-start justify-between gap-3 mb-2">
         <h2 className="text-base font-semibold text-slate-800">
           {SECTION_TITLES[sectionKey] ?? sectionKey}
         </h2>
-        <div className="flex items-center gap-2 flex-shrink-0">
-          <ConfidenceBadge level={section.confidence} />
-          <StatusBadge status={section.status} />
-          {section.status !== 'approved' && (
-            <button
-              onClick={handleApprove}
-              className="rounded-md bg-green-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-green-700 flex items-center gap-1"
-            >
-              <Check className="h-3 w-3" />Approve
-            </button>
-          )}
-          {!editing && (
+
+        {/* Actions — pill-shaped button group */}
+        {!editing && (
+          <div className="flex items-center flex-shrink-0 rounded-lg border border-slate-200 bg-slate-50 p-1 gap-1">
+            {section.status !== 'approved' && (
+              <button
+                onClick={handleApprove}
+                className="rounded-md bg-green-600 px-3 py-1 text-xs font-medium text-white hover:bg-green-700 flex items-center gap-1"
+              >
+                <Check className="h-3 w-3" />Approve
+              </button>
+            )}
             <button
               onClick={handleEdit}
-              className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 hover:border-slate-400 flex items-center gap-1"
+              className="rounded-md border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600 hover:bg-white hover:border-slate-300 hover:text-slate-800 flex items-center gap-1"
             >
               <Edit2 className="h-3 w-3" />Edit
             </button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
-      {/* Requires-judgment banner */}
-      {sectionFlags.map((f) => (
-        <div key={f.message} className="mb-3 flex items-start gap-2 rounded-lg bg-orange-50 border border-orange-200 px-3 py-2">
-          <AlertTriangle className="h-4 w-4 text-orange-500 flex-shrink-0 mt-0.5" />
-          <p className="text-xs text-orange-800">{f.message}</p>
-        </div>
-      ))}
+      {/* Signals row — metadata byline under the title */}
+      <div className="flex flex-wrap items-center gap-2.5 mb-4 pb-3 border-b border-slate-100">
+        <ConfidenceBadge level={section.confidence} />
+        <span className="text-slate-300 text-xs">·</span>
+        <StatusBadge status={section.status} />
+        {sectionFlags.map((f) => (
+          <span key={f.message} className="inline-flex items-center gap-1 text-xs text-orange-600">
+            <span className="text-slate-300">·</span>
+            <AlertTriangle className="h-3 w-3 flex-shrink-0" />
+            {f.message}
+          </span>
+        ))}
+      </div>
 
       {/* Content */}
       {!editing ? (
         <div className="space-y-3">
-          {section.content.split('\n\n').map((para, i) => (
-            para.trim() && <p key={i} className="text-sm text-slate-700 leading-relaxed">{para}</p>
-          ))}
+          {section.content ? (
+            section.content.split('\n\n').map((para, i) => (
+              para.trim() && <p key={i} className="text-sm text-slate-700 leading-relaxed">{para}</p>
+            ))
+          ) : (
+            <p className="text-sm text-slate-400 italic">Click Edit to add content...</p>
+          )}
         </div>
       ) : (
         <div className="space-y-3">

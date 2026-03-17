@@ -20,7 +20,7 @@ interface Props {
 }
 
 function statusDot(section?: ProtocolSection) {
-  if (!section) return 'bg-slate-200'
+  if (!section || !section.content) return 'bg-slate-200'
   const s = section.status ?? (section.ai_generated ? 'ai_generated' : 'edited')
   if (s === 'approved') return 'bg-green-500'
   if (s === 'edited') return 'bg-blue-500'
