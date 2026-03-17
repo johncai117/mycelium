@@ -183,9 +183,13 @@ export function ProtocolSectionView({
       {/* Content */}
       {!editing ? (
         <div className="space-y-3">
-          {section.content.split('\n\n').map((para, i) => (
-            para.trim() && <p key={i} className="text-sm text-slate-700 leading-relaxed">{para}</p>
-          ))}
+          {section.content ? (
+            section.content.split('\n\n').map((para, i) => (
+              para.trim() && <p key={i} className="text-sm text-slate-700 leading-relaxed">{para}</p>
+            ))
+          ) : (
+            <p className="text-sm text-slate-400 italic">Click Edit to add content...</p>
+          )}
         </div>
       ) : (
         <div className="space-y-3">
