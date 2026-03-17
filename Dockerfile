@@ -29,7 +29,7 @@ COPY --chown=developer:developer . .
 
 # Install Python dependencies if requirements.txt exists
 RUN if [ -f backend/requirements.txt ]; then \
-        pip install --no-cache-dir -r backend/requirements.txt; \
+        pip install --no-cache-dir --break-system-packages -r backend/requirements.txt; \
     fi
 
 USER developer

@@ -256,10 +256,18 @@ const MOCK_EVAL_RESULT: EvalResult = {
 
 // ── Real API client ────────────────────────────────────────────────────────────
 
+const API_KEY = import.meta.env.VITE_API_KEY || ''
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000',
   headers: { 'Content-Type': 'application/json' },
 })
+
+if (!MOCK_MODE && API_KEY) {
+  api.interceptors.request.use((config) => {
+    config.headers['Authorization'] = `Bearer ${API_KEY}`
+    return config
+  })
+}
 
 // ── Clarify ───────────────────────────────────────────────────────────────────
 
