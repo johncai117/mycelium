@@ -1,4 +1,7 @@
 import { useNavigate } from 'react-router-dom'
+import { getStudies } from '@/api'
+import { EXAMPLE_PROTOCOLS } from '@/data/exampleStudies'
+import type { StudyListItem } from '@/types'
 
 interface OnboardingModalProps {
   onClose: () => void
@@ -7,7 +10,29 @@ interface OnboardingModalProps {
 export function OnboardingModal({ onClose }: OnboardingModalProps) {
   const navigate = useNavigate()
 
+  function seedDemoData() {
+    if (getStudies().length === 0) {
+      const studyItems: StudyListItem[] = EXAMPLE_PROTOCOLS.map((p) => ({
+        id: p.study_id,
+        drug_name: p.study_inputs.drug_name,
+        indication: p.study_inputs.indication,
+        study_type: p.study_inputs.study_type,
+        status: 'drafting' as const,
+        updated_at: p.updated_at,
+        sponsor: p.study_inputs.sponsor,
+      }))
+      localStorage.setItem('mycelium_studies', JSON.stringify(studyItems))
+
+      const protocolsMap: Record<string, typeof EXAMPLE_PROTOCOLS[number]> = {}
+      for (const p of EXAMPLE_PROTOCOLS) {
+        protocolsMap[p.study_id] = p
+      }
+      localStorage.setItem('mycelium_protocols', JSON.stringify(protocolsMap))
+    }
+  }
+
   function dismiss() {
+    seedDemoData()
     localStorage.setItem('onboarding_seen', 'true')
     onClose()
   }
