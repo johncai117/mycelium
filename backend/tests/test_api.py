@@ -39,6 +39,12 @@ SAMPLE_INPUT = {
     "clinical_context": "This PASS is required under EMA condition following approval of tofacitinib for RA. "
                         "The study evaluates cardiovascular safety including VTE, MACE, and malignancy risks "
                         "relative to TNF inhibitors as mandated by the 2019 safety review.",
+    "methodology": "acnu",
+    "methodology_confidence": "recommended",
+    "research_question_type": "safety_signal",
+    "outcome_rarity": "uncommon",
+    "data_collection": "claims_ehr",
+    "time_horizon": "chronic",
 }
 
 

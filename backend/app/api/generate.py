@@ -6,8 +6,14 @@ from pydantic import BaseModel
 
 from app.models.study_input import StudyInput
 from app.models.protocol import Protocol, ProtocolSection, CodeSets, ProtocolFlag
+from app.models.methodology import METHODOLOGY_REGISTRY, MethodologyCategory
 from app.services.llm import LLMService
 from app.services.code_sets import CodeSetService
+from app.prompts.methodology_overlays import (
+    METHODOLOGY_OVERLAYS,
+    SECTION_LABEL_OVERRIDES,
+    SECTION_SKIP,
+)
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -33,9 +39,18 @@ SECTION_ORDER = [
 JUDGMENT_REQUIRED_SECTIONS = {"cohort_definition", "variables", "data_analysis"}
 
 
-def _load_prompt(name: str) -> str:
+def _load_prompt(name: str, methodology: str | None = None) -> str:
     path = PROMPTS_DIR / f"{name}.md"
-    return path.read_text() if path.exists() else f"You are an expert epidemiologist writing the {name} section of a regulatory study protocol."
+    base = path.read_text() if path.exists() else f"You are an expert epidemiologist writing the {name} section of a regulatory study protocol."
+
+    if methodology:
+        section_key = name.replace("section_", "")
+        overlays = METHODOLOGY_OVERLAYS.get(methodology, {})
+        overlay_text = overlays.get(section_key)
+        if overlay_text:
+            base += f"\n\n## Methodology-Specific Instructions ({methodology.upper()})\n{overlay_text}"
+
+    return base
 
 
 def _confidence_from_inputs(section_name: str, inputs: StudyInput) -> str:
@@ -77,15 +92,25 @@ async def generate_protocol(request: GenerateRequest):
         sections = {}
         flags = []
         prior_sections = {}
+        methodology = request.study_inputs.methodology
+        skip_sections = SECTION_SKIP.get(methodology, set()) if methodology else set()
 
         for section_name in SECTION_ORDER:
-            prompt = _load_prompt(f"section_{section_name}")
+            if section_name in skip_sections:
+                continue
+
+            # Get methodology-specific section label for the prompt
+            label_overrides = SECTION_LABEL_OVERRIDES.get(methodology, {}) if methodology else {}
+            display_label = label_overrides.get(section_name, section_name.replace("_", " ").title())
+
+            prompt = _load_prompt(f"section_{section_name}", methodology)
             content = llm.generate_section(
                 section_name=section_name,
                 study_inputs=request.study_inputs,
                 retrieved_chunks=request.retrieved_chunks,
                 system_prompt=prompt,
                 prior_sections=prior_sections if prior_sections else None,
+                section_display_label=display_label,
             )
             confidence = _confidence_from_inputs(section_name, request.study_inputs)
             sections[section_name] = ProtocolSection(

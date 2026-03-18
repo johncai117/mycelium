@@ -1,6 +1,11 @@
 import { useState } from 'react'
 import { ChevronDown, ChevronUp, CheckCircle, Loader2 } from 'lucide-react'
-import type { ClarifyQuestion } from '@/types'
+import type {
+  ClarifyQuestion,
+  MethodologyRecommendation as MethodologyRec,
+  MethodologyCategory,
+} from '@/types'
+import { MethodologyRecommendation } from './MethodologyRecommendation'
 
 interface Props {
   isLoading: boolean
@@ -9,6 +14,10 @@ interface Props {
   answers: Record<string, string>
   onAnswerChange: (field: string, value: string) => void
   requiredAnswered: boolean
+  methodologyLoading?: boolean
+  methodologyRecommendation?: MethodologyRec | null
+  selectedMethodology?: MethodologyCategory | null
+  onMethodologySelect?: (methodology: MethodologyCategory, confidence: 'recommended' | 'overridden') => void
 }
 
 function QuestionCard({
@@ -105,6 +114,10 @@ export function Step4FollowUpQuestions({
   questions,
   answers,
   onAnswerChange,
+  methodologyLoading = false,
+  methodologyRecommendation = null,
+  selectedMethodology = null,
+  onMethodologySelect,
 }: Props) {
   if (isLoading) {
     return (
@@ -171,6 +184,15 @@ export function Step4FollowUpQuestions({
             />
           ))}
         </div>
+      )}
+
+      {onMethodologySelect && (
+        <MethodologyRecommendation
+          isLoading={methodologyLoading}
+          recommendation={methodologyRecommendation}
+          selectedMethodology={selectedMethodology}
+          onSelect={onMethodologySelect}
+        />
       )}
     </div>
   )

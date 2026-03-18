@@ -27,3 +27,16 @@ class StudyInput(BaseModel):
     washout_days: Optional[int] = 180
     new_user_design: Optional[bool] = True
     clinical_context: Optional[str] = None
+
+    # Methodology decision fields
+    methodology: Optional[str] = None  # MethodologyCategory value
+    methodology_confidence: Optional[Literal[
+        "recommended", "user_selected", "overridden"
+    ]] = None
+    research_question_type: Optional[Literal[
+        "safety_signal", "drug_utilization", "effectiveness",
+        "risk_minimization", "pregnancy_safety", "other"
+    ]] = None
+    outcome_rarity: Optional[Literal["common", "uncommon", "rare", "very_rare"]] = None
+    data_collection: Optional[Literal["claims_ehr", "registry", "survey", "prospective"]] = None
+    time_horizon: Optional[Literal["acute", "subacute", "chronic"]] = None

@@ -7,6 +7,65 @@ from app.models.eval_result import ENCEPPItem, EvalResult, ImprovementSuggestion
 
 logger = logging.getLogger(__name__)
 
+# Methodology-specific checklist items appended to base ENCEPP_CHECKLIST
+METHODOLOGY_CHECKLIST: dict[str, list[dict]] = {
+    "acnu": [
+        {"item": "Active comparator clinically justified", "section": "study_design", "keywords": ["active comparator", "comparator", "justified", "appropriate"]},
+        {"item": "Symmetric cohort entry criteria documented", "section": "cohort_definition", "keywords": ["symmetric", "identical criteria", "same eligibility", "same washout"]},
+        {"item": "Propensity score method specified", "section": "data_analysis", "keywords": ["propensity score", "iptw", "matching", "overlap weight"]},
+        {"item": "Balance diagnostics planned", "section": "data_analysis", "keywords": ["balance", "smd", "standardized mean difference", "covariate balance"]},
+    ],
+    "prevalent_user": [
+        {"item": "Prevalent-user bias acknowledged and mitigated", "section": "study_design", "keywords": ["prevalent user", "prevalent-user bias", "depletion of susceptibles"]},
+        {"item": "Treatment duration at entry addressed", "section": "cohort_definition", "keywords": ["treatment duration", "time on treatment", "duration at entry"]},
+        {"item": "Immortal time bias addressed", "section": "data_analysis", "keywords": ["immortal time", "immortal time bias", "landmark"]},
+    ],
+    "descriptive_cohort": [
+        {"item": "Absence of comparator justified", "section": "study_design", "keywords": ["no comparator", "single-arm", "single arm", "descriptive"]},
+        {"item": "External comparison rates cited if applicable", "section": "data_analysis", "keywords": ["background rate", "external", "reference rate", "expected rate"]},
+    ],
+    "nested_case_control": [
+        {"item": "Source cohort clearly defined", "section": "cohort_definition", "keywords": ["source cohort", "base cohort", "underlying cohort"]},
+        {"item": "Incidence density sampling specified", "section": "cohort_definition", "keywords": ["incidence density", "risk-set sampling", "risk set", "density sampling"]},
+        {"item": "Number of controls per case stated", "section": "cohort_definition", "keywords": ["controls per case", "control ratio", "matched controls"]},
+        {"item": "Conditional logistic regression specified", "section": "data_analysis", "keywords": ["conditional logistic", "conditional regression", "matched analysis"]},
+    ],
+    "population_case_control": [
+        {"item": "Population representativeness addressed", "section": "study_design", "keywords": ["representative", "population-based", "source population"]},
+        {"item": "Control selection strategy defined", "section": "cohort_definition", "keywords": ["control selection", "control sampling", "control group"]},
+    ],
+    "sccs": [
+        {"item": "Risk windows defined with duration", "section": "cohort_definition", "keywords": ["risk window", "risk period", "exposed period", "days 1"]},
+        {"item": "Control windows defined", "section": "cohort_definition", "keywords": ["control window", "control period", "unexposed", "baseline period"]},
+        {"item": "Event-independent exposure assumption addressed", "section": "study_design", "keywords": ["event-dependent", "event independent", "modified sccs", "assumption"]},
+        {"item": "Conditional Poisson regression specified", "section": "data_analysis", "keywords": ["conditional poisson", "poisson regression", "sccs model"]},
+    ],
+    "case_crossover": [
+        {"item": "Hazard window defined", "section": "cohort_definition", "keywords": ["hazard window", "hazard period", "case window"]},
+        {"item": "Control window(s) defined", "section": "cohort_definition", "keywords": ["control window", "referent window", "reference period"]},
+        {"item": "Transient exposure assumption justified", "section": "study_design", "keywords": ["transient", "intermittent", "acute effect"]},
+    ],
+    "drug_utilization": [
+        {"item": "Utilization metrics defined (DDD, duration, switching)", "section": "variables", "keywords": ["ddd", "defined daily dose", "treatment duration", "switching", "adherence"]},
+        {"item": "Prescribing patterns characterized", "section": "variables", "keywords": ["prescribing pattern", "utilization pattern", "prescribing volume"]},
+    ],
+    "prospective_registry": [
+        {"item": "Enrollment procedures described", "section": "cohort_definition", "keywords": ["enrollment", "enrolment", "recruitment", "registration"]},
+        {"item": "Follow-up schedule specified", "section": "cohort_definition", "keywords": ["follow-up schedule", "visit schedule", "follow-up visit", "assessment time"]},
+        {"item": "Attrition strategy described", "section": "data_analysis", "keywords": ["attrition", "loss to follow-up", "retention", "dropout"]},
+    ],
+    "pregnancy_registry": [
+        {"item": "Pregnancy outcome definitions specified", "section": "cohort_definition", "keywords": ["live birth", "spontaneous abortion", "stillbirth", "congenital malformation"]},
+        {"item": "Gestational timing of exposure defined", "section": "cohort_definition", "keywords": ["trimester", "gestational age", "first trimester", "gestational week"]},
+        {"item": "Background malformation rates referenced", "section": "data_analysis", "keywords": ["background rate", "eurocat", "baseline prevalence", "expected rate"]},
+    ],
+    "survey": [
+        {"item": "Survey instrument described or referenced", "section": "cohort_definition", "keywords": ["questionnaire", "survey instrument", "survey tool", "validated"]},
+        {"item": "Response rate and non-response bias addressed", "section": "data_analysis", "keywords": ["response rate", "non-response", "nonresponse", "participation rate"]},
+        {"item": "Target sample size for survey justified", "section": "cohort_definition", "keywords": ["sample size", "target sample", "number of respondents"]},
+    ],
+}
+
 # ENCEPP checklist items mapped to protocol sections
 ENCEPP_CHECKLIST = [
     # Research Question
@@ -103,9 +162,16 @@ def _compute_grade(score: int) -> str:
 
 
 def score_protocol(protocol: Protocol) -> EvalResult:
-    items = [_score_item(item, protocol) for item in ENCEPP_CHECKLIST]
+    checklist = list(ENCEPP_CHECKLIST)
+
+    # Append methodology-specific items if methodology is set
+    methodology = getattr(protocol.study_inputs, "methodology", None) if protocol.study_inputs else None
+    if methodology and methodology in METHODOLOGY_CHECKLIST:
+        checklist = checklist + METHODOLOGY_CHECKLIST[methodology]
+
+    items = [_score_item(item, protocol) for item in checklist]
     total_points = sum(i.score for i in items)
-    max_points = len(ENCEPP_CHECKLIST)
+    max_points = len(checklist)
     encepp_score = round((total_points / max_points) * 100) if max_points > 0 else 0
     grade = _compute_grade(encepp_score)
 

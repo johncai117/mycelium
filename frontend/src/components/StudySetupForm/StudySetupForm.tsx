@@ -5,7 +5,7 @@ import { Step1CoreInputs } from './Step1CoreInputs'
 import { Step2DesignDetails } from './Step2DesignDetails'
 import { Step3ClinicalContext } from './Step3ClinicalContext'
 import { Step4FollowUpQuestions } from './Step4FollowUpQuestions'
-import { clarifyInputs } from '@/api'
+import { clarifyInputs, recommendMethodology } from '@/api'
 import type { StudyInput } from '@/types'
 import { EXAMPLE_STUDY_INPUT } from '@/data/exampleStudies'
 
@@ -35,10 +35,15 @@ export function StudySetupForm({ onSubmit, isGenerating }: Props) {
     setClarifyAnswers,
     getStudyInputs,
     requiredQuestionsAnswered,
+    methodologyRecommendation,
+    setMethodologyRecommendation,
+    selectedMethodology,
+    selectMethodology,
   } = useStudyForm()
 
   const [clarifyLoading, setClarifyLoading] = useState(false)
   const [clarifyError, setClarifyError] = useState<string | null>(null)
+  const [methodologyLoading, setMethodologyLoading] = useState(false)
 
   const handleNext = async () => {
     if (currentStep === 3) {
@@ -50,6 +55,13 @@ export function StudySetupForm({ onSubmit, isGenerating }: Props) {
         const result = await clarifyInputs(inputs)
         setClarifyQuestions(result.questions)
         setIsSufficient(result.is_sufficient)
+
+        // Trigger methodology recommendation in parallel
+        setMethodologyLoading(true)
+        recommendMethodology(inputs)
+          .then((rec) => setMethodologyRecommendation(rec))
+          .catch(() => {})
+          .finally(() => setMethodologyLoading(false))
       } catch {
         setClarifyError('Could not reach the server. You can still generate with current inputs.')
         setIsSufficient(true)
@@ -148,6 +160,10 @@ export function StudySetupForm({ onSubmit, isGenerating }: Props) {
               setClarifyAnswers((prev) => ({ ...prev, [field]: val }))
             }
             requiredAnswered={requiredQuestionsAnswered}
+            methodologyLoading={methodologyLoading}
+            methodologyRecommendation={methodologyRecommendation}
+            selectedMethodology={selectedMethodology}
+            onMethodologySelect={selectMethodology}
           />
         )}
 

@@ -9,12 +9,6 @@ class ENCEPPItem(BaseModel):
     finding: str
 
 
-class ENCEPPScore(BaseModel):
-    total: int  # 0–100
-    grade: Literal["A", "B", "C", "D"]
-    items: list[ENCEPPItem]
-
-
 class ImprovementSuggestion(BaseModel):
     section: str
     suggestion: str

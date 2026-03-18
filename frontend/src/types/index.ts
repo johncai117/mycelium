@@ -2,6 +2,30 @@
 
 export type StudyType = 'cohort' | 'case_control' | 'cross_sectional' | 'other'
 export type RegulatoryContext = 'PASS' | 'voluntary' | 'investigator_initiated'
+export type MethodologyCategory =
+  | 'acnu'
+  | 'prevalent_user'
+  | 'descriptive_cohort'
+  | 'nested_case_control'
+  | 'population_case_control'
+  | 'sccs'
+  | 'case_crossover'
+  | 'cross_sectional'
+  | 'drug_utilization'
+  | 'prospective_registry'
+  | 'pregnancy_registry'
+  | 'survey'
+export type ResearchQuestionType =
+  | 'safety_signal'
+  | 'drug_utilization'
+  | 'effectiveness'
+  | 'risk_minimization'
+  | 'pregnancy_safety'
+  | 'other'
+export type OutcomeRarity = 'common' | 'uncommon' | 'rare' | 'very_rare'
+export type DataCollection = 'claims_ehr' | 'registry' | 'survey' | 'prospective'
+export type TimeHorizon = 'acute' | 'subacute' | 'chronic'
+export type MethodologyConfidence = 'recommended' | 'user_selected' | 'overridden'
 export type Confidence = 'high' | 'medium' | 'low'
 export type StudyStatus = 'drafting' | 'review' | 'exported'
 export type Grade = 'A' | 'B' | 'C' | 'D'
@@ -26,6 +50,12 @@ export interface StudyInput {
   washout_days?: number
   new_user_design?: boolean
   clinical_context?: string
+  methodology?: MethodologyCategory
+  methodology_confidence?: MethodologyConfidence
+  research_question_type?: ResearchQuestionType
+  outcome_rarity?: OutcomeRarity
+  data_collection?: DataCollection
+  time_horizon?: TimeHorizon
 }
 
 // ── Protocol ─────────────────────────────────────────────────────────────────
@@ -137,4 +167,21 @@ export interface GenerateResponse {
 export interface RegenerateResponse {
   content: string
   change_summary: string
+}
+
+// ── Methodology ──────────────────────────────────────────────────────────────
+
+export interface MethodologyAlternative {
+  id: MethodologyCategory
+  display_name: string
+  score: number
+}
+
+export interface MethodologyRecommendation {
+  primary: MethodologyCategory
+  primary_display_name: string
+  primary_description: string
+  confidence_score: number
+  reasoning: string
+  alternatives: MethodologyAlternative[]
 }

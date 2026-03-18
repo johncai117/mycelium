@@ -8,6 +8,7 @@ import type {
   RegenerateResponse,
   EvalResult,
   StudyListItem,
+  MethodologyRecommendation,
 } from '@/types'
 
 // ── Mock mode ─────────────────────────────────────────────────────────────────
@@ -280,6 +281,35 @@ export async function clarifyInputs(study_inputs: StudyInput): Promise<ClarifyRe
   return data
 }
 
+// ── Methodology Recommendation ───────────────────────────────────────────────
+
+const MOCK_METHODOLOGY_RECOMMENDATION: MethodologyRecommendation = {
+  primary: 'acnu',
+  primary_display_name: 'Active Comparator New-User (ACNU) Cohort',
+  primary_description:
+    'Gold standard for comparative drug safety. Compares new users of the drug of interest with new users of an active comparator, minimizing prevalent-user bias and healthy-user bias.',
+  confidence_score: 0.87,
+  reasoning:
+    'Based on your study parameters, Active Comparator New-User (ACNU) Cohort is recommended for safety signal investigation, the chronic time horizon. Gold standard for comparative drug safety.',
+  alternatives: [
+    { id: 'nested_case_control', display_name: 'Nested Case-Control', score: 0.62 },
+    { id: 'prevalent_user', display_name: 'Prevalent User Cohort', score: 0.58 },
+  ],
+}
+
+export async function recommendMethodology(
+  study_inputs: StudyInput,
+): Promise<MethodologyRecommendation> {
+  if (MOCK_MODE) {
+    await delay()
+    return MOCK_METHODOLOGY_RECOMMENDATION
+  }
+  const { data } = await api.post<MethodologyRecommendation>('/methodology/recommend', {
+    study_inputs,
+  })
+  return data
+}
+
 // ── Retrieve ──────────────────────────────────────────────────────────────────
 
 export async function retrieveProtocols(study_inputs: StudyInput): Promise<RetrievedChunk[]> {
@@ -424,14 +454,4 @@ export function saveProtocol(protocol: Protocol): void {
   }
   saveStudies(studies)
   saveProtocols(protocols)
-}
-
-export function updateStudyStatus(id: string, status: StudyListItem['status']): void {
-  const studies = loadStudies()
-  const idx = studies.findIndex((s) => s.id === id)
-  if (idx >= 0) {
-    studies[idx].status = status
-    studies[idx].updated_at = new Date().toISOString()
-    saveStudies(studies)
-  }
 }
