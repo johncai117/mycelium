@@ -143,7 +143,7 @@ export function StudySetupForm({ onSubmit, isGenerating }: Props) {
       </div>
 
       {/* Step content */}
-      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm min-h-[400px] max-h-[60vh] overflow-y-auto">
+      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm min-h-[400px]">
         <h2 className="text-base font-semibold text-slate-800 mb-5">
           {STEPS[currentStep - 1].label}
         </h2>
