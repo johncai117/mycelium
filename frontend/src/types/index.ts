@@ -55,6 +55,53 @@ export interface TemplateUploadResponse {
   size_bytes: number
 }
 
+// ── EMA/HMA Data Sources ─────────────────────────────────────────────────────
+
+export interface EMADataSource {
+  name: string
+  acronym: string | null
+  type: string | null
+  countries: string | null
+  regions: string | null
+  care_setting: string | null
+  darwin_eu_partner: string | null
+  qualified: string | null
+  data_from: string | null
+  data_to: string | null
+  median_obs_years: string | null
+  population_size: string | null
+  active_population_size: string | null
+  age_groups: string | null
+  website: string | null
+  disease_info_detail: string | null
+  rare_diseases: string | null
+  pregnancy_neonates: string | null
+  hospital_admissions: string | null
+  cause_of_death: string | null
+  cod_vocabulary: string | null
+  prescriptions: string | null
+  rx_vocabulary: string | null
+  dispensing: string | null
+  diagnostic_codes: string | null
+  dx_vocabulary: string | null
+  drug_vocabulary: string | null
+  clinical_measurements: string | null
+  genetic_data: string | null
+  biomarker_data: string | null
+  pro_data: string | null
+  sociodemographic: string | null
+  linkage_available: string | null
+  linked_sources: string | null
+  cdm_mapped: string | null
+  cdm_version: string | null
+  informed_consent_required: string | null
+  data_refresh: string | null
+  validation_possible: string | null
+  funding_type: string | null
+  population_coverage_pct: string | null
+  family_linkage: string | null
+}
+
 // ── Study Input ───────────────────────────────────────────────────────────────
 
 export interface StudyInput {
@@ -85,6 +132,8 @@ export interface StudyInput {
   regulatory_requirement_types?: string[]
   regulatory_doc_extracted?: RegulatoryDocExtracted | null
   protocol_template_id?: string
+  // Data source selection
+  selected_data_sources?: string[]
 }
 
 // ── Protocol ─────────────────────────────────────────────────────────────────
