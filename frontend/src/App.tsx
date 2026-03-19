@@ -1,6 +1,7 @@
 import { Routes, Route, Link, useLocation } from 'react-router-dom'
 import { StudyList } from './pages/StudyList'
 import { StudySetup } from './pages/StudySetup'
+import { DataSourceSelector } from './pages/DataSourceSelector'
 import { ProtocolDraft } from './pages/ProtocolDraft'
 import { HowItWorks } from './pages/HowItWorks'
 import { MOCK_MODE } from './api'
@@ -60,6 +61,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<StudyList />} />
         <Route path="/study/new" element={<StudySetup />} />
+        <Route path="/study/new/data-sources" element={<DataSourceSelector />} />
         <Route path="/study/:id/draft" element={<ProtocolDraft />} />
         <Route path="/how-it-works" element={<HowItWorks />} />
       </Routes>
