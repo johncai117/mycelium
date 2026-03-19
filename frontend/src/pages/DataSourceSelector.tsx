@@ -269,7 +269,9 @@ function FilterSelect({ label, value, options, onChange }: FilterSelectProps) {
 export function DataSourceSelector() {
   const navigate = useNavigate()
   const location = useLocation()
-  const inputs = (location.state as { inputs: StudyInput } | null)?.inputs ?? null
+  const locationState = location.state as { inputs?: StudyInput; fromTour?: boolean } | null
+  const inputs = locationState?.inputs ?? null
+  const fromTour = locationState?.fromTour ?? false
 
   const [filters, setFilters] = useState<Filters>({
     search: '',
@@ -379,6 +381,15 @@ export function DataSourceSelector() {
           </p>
         </div>
 
+        {/* Tour mode banner */}
+        {fromTour && (
+          <div className="mb-4 rounded-lg bg-blue-50 border border-blue-200 px-4 py-3">
+            <p className="text-sm text-blue-800">
+              👋 Tour mode — explore the data source catalog. In real use, your study inputs would filter recommendations.
+            </p>
+          </div>
+        )}
+
         {/* Error */}
         {error && (
           <div className="mb-4 rounded-lg bg-red-50 border border-red-200 px-4 py-3">
@@ -463,14 +474,14 @@ export function DataSourceSelector() {
             <div className="flex gap-2 ml-auto">
               <button
                 onClick={() => handleProceed(false)}
-                disabled={isGenerating}
+                disabled={isGenerating || fromTour}
                 className="rounded-md border border-slate-300 bg-white px-4 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-40"
               >
                 Skip selection
               </button>
               <button
                 onClick={() => handleProceed(true)}
-                disabled={isGenerating}
+                disabled={isGenerating || fromTour}
                 className="rounded-md bg-blue-600 px-4 py-1.5 text-xs font-medium text-white hover:bg-blue-700 disabled:opacity-40 flex items-center gap-1.5"
               >
                 {isGenerating ? (
@@ -524,19 +535,21 @@ export function DataSourceSelector() {
             ← Back to form
           </button>
           <div className="flex gap-3 items-center">
-            {selectedNames.length === 0 && (
+            {fromTour ? (
+              <span className="text-xs text-slate-400 italic">In tour mode — proceed is disabled</span>
+            ) : selectedNames.length === 0 ? (
               <span className="text-xs text-slate-400">Select 1–3 sources or skip</span>
-            )}
+            ) : null}
             <button
               onClick={() => handleProceed(false)}
-              disabled={isGenerating}
+              disabled={isGenerating || fromTour}
               className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-40"
             >
               Skip — generate without data source
             </button>
             <button
               onClick={() => handleProceed(true)}
-              disabled={isGenerating || selectedNames.length === 0}
+              disabled={isGenerating || fromTour || selectedNames.length === 0}
               className="rounded-md bg-blue-600 px-5 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-40 flex items-center gap-2"
             >
               {isGenerating ? (

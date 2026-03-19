@@ -1,9 +1,7 @@
-import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Plus, FileText, Clock } from 'lucide-react'
 import { getStudies } from '@/api'
 import type { StudyListItem } from '@/types'
-import { OnboardingModal } from '@/components/shared/OnboardingModal'
 
 function StatusBadge({ status }: { status: StudyListItem['status'] }) {
   const styles = {
@@ -38,16 +36,12 @@ function EmptyState({ onNew }: { onNew: () => void }) {
   )
 }
 
-export function StudyList() {
+export function StudyList({ onTakeTour }: { onTakeTour: () => void }) {
   const navigate = useNavigate()
   const studies = getStudies()
-  const [showOnboarding, setShowOnboarding] = useState(
-    () => !localStorage.getItem('onboarding_seen')
-  )
 
   return (
     <>
-    {showOnboarding && <OnboardingModal onClose={() => setShowOnboarding(false)} />}
     <div className="max-w-5xl mx-auto px-6 py-8">
       <div className="flex items-center justify-between mb-6" data-tour="study-header">
         <div>
@@ -56,7 +50,7 @@ export function StudyList() {
             {studies.length} protocol{studies.length !== 1 ? 's' : ''} in workspace
             {' · '}
             <button
-              onClick={() => setShowOnboarding(true)}
+              onClick={onTakeTour}
               className="text-blue-500 hover:text-blue-600 transition-colors underline underline-offset-2"
             >
               Take the tour
