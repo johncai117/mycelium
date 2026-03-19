@@ -314,8 +314,8 @@ export async function recommendMethodology(
 
 // ── Retrieve ──────────────────────────────────────────────────────────────────
 
-export async function retrieveProtocols(study_inputs: StudyInput): Promise<RetrievedChunk[]> {
-  if (MOCK_MODE) {
+export async function retrieveProtocols(study_inputs: StudyInput, forceDemo = false): Promise<RetrievedChunk[]> {
+  if (MOCK_MODE || forceDemo) {
     await delay(400)
     return []
   }
@@ -328,8 +328,9 @@ export async function retrieveProtocols(study_inputs: StudyInput): Promise<Retri
 export async function generateProtocol(
   study_inputs: StudyInput,
   retrieved_chunks: RetrievedChunk[] = [],
+  forceDemo = false,
 ): Promise<GenerateResponse> {
-  if (MOCK_MODE) {
+  if (MOCK_MODE || forceDemo) {
     await delay(1800)
     return {
       sections: MOCK_PROTOCOL.sections,
