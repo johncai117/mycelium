@@ -49,14 +49,22 @@ export function StudyList() {
     <>
     {showOnboarding && <OnboardingModal onClose={() => setShowOnboarding(false)} />}
     <div className="max-w-5xl mx-auto px-6 py-8">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6" data-tour="study-header">
         <div>
           <h1 className="text-xl font-semibold text-slate-800">Studies</h1>
           <p className="text-sm text-slate-400 mt-0.5">
             {studies.length} protocol{studies.length !== 1 ? 's' : ''} in workspace
+            {' · '}
+            <button
+              onClick={() => setShowOnboarding(true)}
+              className="text-blue-500 hover:text-blue-600 transition-colors underline underline-offset-2"
+            >
+              Take the tour
+            </button>
           </p>
         </div>
         <button
+          data-tour="new-study"
           onClick={() => navigate('/study/new')}
           className="flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
         >
