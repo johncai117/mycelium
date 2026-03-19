@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Routes, Route, Link, useLocation } from 'react-router-dom'
 import { StudyList } from './pages/StudyList'
 import { StudySetup } from './pages/StudySetup'
@@ -5,8 +6,9 @@ import { DataSourceSelector } from './pages/DataSourceSelector'
 import { ProtocolDraft } from './pages/ProtocolDraft'
 import { HowItWorks } from './pages/HowItWorks'
 import { MOCK_MODE } from './api'
+import { OnboardingModal } from './components/shared/OnboardingModal'
 
-function Nav() {
+function Nav({ onTakeTour }: { onTakeTour: () => void }) {
   const location = useLocation()
   const isDraft = location.pathname.includes('/draft')
 
@@ -38,6 +40,12 @@ function Nav() {
           >
             Guide
           </Link>
+          <button
+            onClick={onTakeTour}
+            className="font-medium text-slate-500 hover:text-slate-700 transition-colors"
+          >
+            Tour ✦
+          </button>
         </nav>
       </div>
     </header>
@@ -54,17 +62,22 @@ function MockBanner() {
 }
 
 export default function App() {
+  const [showOnboarding, setShowOnboarding] = useState(
+    () => !localStorage.getItem('onboarding_seen')
+  )
+
   return (
     <div className="min-h-screen bg-slate-50">
       <MockBanner />
-      <Nav />
+      <Nav onTakeTour={() => setShowOnboarding(true)} />
       <Routes>
-        <Route path="/" element={<StudyList />} />
+        <Route path="/" element={<StudyList onTakeTour={() => setShowOnboarding(true)} />} />
         <Route path="/study/new" element={<StudySetup />} />
         <Route path="/study/new/data-sources" element={<DataSourceSelector />} />
         <Route path="/study/:id/draft" element={<ProtocolDraft />} />
         <Route path="/how-it-works" element={<HowItWorks />} />
       </Routes>
+      {showOnboarding && <OnboardingModal onClose={() => setShowOnboarding(false)} />}
     </div>
   )
 }
