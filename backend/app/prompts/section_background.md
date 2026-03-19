@@ -18,3 +18,9 @@ Writing guidelines:
 - Conclude with a clear statement of why this study is necessary
 
 The background section sets the scientific context for all subsequent sections. Write as if a regulatory reviewer will read this to understand why this study was undertaken.
+
+If a REGULATORY REQUIREMENT CONTEXT block is present in this prompt, this section MUST anchor to that regulatory obligation. Specifically:
+- Cite the specific PMR/PASS requirement type and application number as the formal basis for the study.
+- Reference the safety signal verbatim from the regulatory context as the clinical motivation.
+- Quote or closely paraphrase the required study description from the regulatory letter to frame the study rationale.
+- Reference the scientific justification provided by the regulator to explain why this study is required at this time.

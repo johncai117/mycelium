@@ -302,6 +302,80 @@ def test_eval_with_content():
     assert len(data["encepp_items"]) > 0
 
 
+# ── Regulatory extraction wired into generation ───────────────────────────────
+
+REGULATORY_INPUT = {
+    **SAMPLE_INPUT,
+    "regulatory_doc_extracted": {
+        "study_description": "Conduct a study to assess the risk of major adverse cardiovascular events (MACE) in patients treated with the drug compared to an active comparator.",
+        "requirement_type": "FDA PMR 505(o)",
+        "milestones": [
+            {"name": "Draft Protocol", "date": "2024-06-01"},
+            {"name": "Final Protocol", "date": "2024-09-01"},
+            {"name": "Study Completion", "date": "2027-01-01"},
+            {"name": "Final Report", "date": "2027-06-01"},
+        ],
+        "safety_signal": "Major adverse cardiovascular events (MACE)",
+        "scientific_justification": "Emerging evidence suggests elevated cardiovascular risk in the target population; a controlled study is required to quantify the risk.",
+        "application_number": "BLA 125469",
+        "applicant_name": "Test Pharma Inc.",
+    },
+    "regulatory_requirement_types": ["FDA PMR 505(o)"],
+    "study_scope": ["Safety study (incl. comparative)"],
+    "selected_data_sources": ["CPRD Aurum", "Optum EHR"],
+}
+
+
+def test_regulatory_doc_extracted_passes_validation():
+    """StudyInput with regulatory_doc_extracted populated should pass Pydantic validation."""
+    from app.models.study_input import StudyInput
+    si = StudyInput(**REGULATORY_INPUT)
+    assert si.regulatory_doc_extracted is not None
+    assert si.regulatory_doc_extracted["application_number"] == "BLA 125469"
+    assert si.selected_data_sources == ["CPRD Aurum", "Optum EHR"]
+    assert si.regulatory_requirement_types == ["FDA PMR 505(o)"]
+    assert si.study_scope == ["Safety study (incl. comparative)"]
+
+
+def test_build_regulatory_context_formats_correctly():
+    """build_regulatory_context should return a non-empty formatted string when doc is present."""
+    from app.models.study_input import StudyInput
+    from app.api.generate import build_regulatory_context
+    si = StudyInput(**REGULATORY_INPUT)
+    ctx = build_regulatory_context(si)
+    assert "REGULATORY REQUIREMENT CONTEXT" in ctx
+    assert "BLA 125469" in ctx
+    assert "Test Pharma Inc." in ctx
+    assert "MACE" in ctx
+    assert "Draft Protocol" in ctx
+    assert "CPRD Aurum" in ctx
+    assert "FDA PMR 505(o)" in ctx
+
+
+def test_build_regulatory_context_empty_when_no_doc():
+    """build_regulatory_context should return empty string when regulatory_doc_extracted is None."""
+    from app.models.study_input import StudyInput
+    from app.api.generate import build_regulatory_context
+    si = StudyInput(**{**SAMPLE_INPUT, "regulatory_doc_extracted": None})
+    assert build_regulatory_context(si) == ""
+
+
+def test_generate_accepts_regulatory_doc_extracted(monkeypatch):
+    """Generate endpoint should accept StudyInput with regulatory_doc_extracted without erroring (LLM mocked)."""
+    from app.services.llm import LLMService
+
+    def mock_generate_section(self, **kwargs):
+        return "Mock section content for regulatory test."
+
+    monkeypatch.setattr(LLMService, "generate_section", mock_generate_section)
+
+    response = client.post("/generate", json={"study_inputs": REGULATORY_INPUT}, headers=AUTH)
+    assert response.status_code == 200
+    data = response.json()
+    assert "sections" in data
+    assert len(data["sections"]) > 0
+
+
 # ── Code sets service ─────────────────────────────────────────────────────────
 
 def test_code_sets_lookup():

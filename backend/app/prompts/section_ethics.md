@@ -27,3 +27,7 @@ Writing guidelines:
 - Length: 200–350 words
 - Use standard regulatory boilerplate language adapted to the specific study
 - Be explicit about the regulatory jurisdiction (US, EU, or both)
+
+If a REGULATORY REQUIREMENT CONTEXT block is present in this prompt, this section MUST reference the specific regulatory mandate. Specifically:
+- State the requirement type (e.g., FDA PMR under FDAAA 505(o), EMA PASS Category 1 imposed obligation) and application number as the formal regulatory basis for this study.
+- Note that the study is conducted in fulfilment of a post-marketing obligation, which may affect the registration and pre-registration requirements (e.g., EU PAS register entry required for EMA PASS; PMR commitment tracking number for FDA PMR).

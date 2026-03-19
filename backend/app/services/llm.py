@@ -74,7 +74,11 @@ class LLMService:
         system_prompt: str,
         prior_sections: Optional[dict] = None,
         section_display_label: Optional[str] = None,
+        regulatory_context: Optional[str] = None,
     ) -> str:
+        if regulatory_context:
+            system_prompt = system_prompt + f"\n\n{regulatory_context}"
+
         chunks_text = "\n\n".join(
             f"[Source: {c.get('source_title', 'Unknown')}]\n{c.get('chunk', '')}"
             for c in retrieved_chunks[:5]
