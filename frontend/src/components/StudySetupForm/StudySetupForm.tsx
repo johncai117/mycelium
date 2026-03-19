@@ -90,9 +90,9 @@ export function StudySetupForm({ onSubmit, isGenerating }: Props) {
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="flex flex-col h-full">
       {/* Load example study */}
-      <div className="flex items-center gap-3 mb-6">
+      <div className="flex items-center gap-3 mb-6 flex-shrink-0">
         <button
           type="button"
           onClick={() => form.reset(EXAMPLE_STUDY_INPUT)}
@@ -104,7 +104,7 @@ export function StudySetupForm({ onSubmit, isGenerating }: Props) {
       </div>
 
       {/* Progress indicator */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-8 flex-shrink-0">
         {STEPS.map((step, i) => (
           <div key={step.number} className="flex items-center flex-1">
             <div className="flex flex-col items-center">
@@ -143,7 +143,7 @@ export function StudySetupForm({ onSubmit, isGenerating }: Props) {
       </div>
 
       {/* Step content */}
-      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm min-h-[400px] max-h-[60vh] overflow-y-auto">
+      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm flex-1 overflow-y-auto min-h-0">
         <h2 className="text-base font-semibold text-slate-800 mb-5">
           {STEPS[currentStep - 1].label}
         </h2>
@@ -179,7 +179,7 @@ export function StudySetupForm({ onSubmit, isGenerating }: Props) {
       </div>
 
       {/* Navigation */}
-      <div className="flex justify-between mt-4">
+      <div className="flex justify-between mt-4 flex-shrink-0">
         <button
           type="button"
           onClick={prevStep}
