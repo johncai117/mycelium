@@ -183,6 +183,41 @@ Return ONLY valid JSON, no other text.
             ],
         )
 
+    def extract_regulatory_doc(self, document_text: str) -> dict:
+        """Extract structured regulatory information from a PMR/PASS document."""
+        system_prompt = (
+            "You are a regulatory affairs expert specializing in FDA Post-Marketing Requirements "
+            "(PMR/PMC) and EMA Post-Authorization Safety Studies (PASS). "
+            "Extract structured information from regulatory documents accurately and concisely."
+        )
+
+        user_message = f"""<document>
+{document_text}
+</document>
+
+<instructions>
+Extract the following fields from this regulatory document (FDA PMR letter, EMA PASS obligation, or RMP extract).
+
+Return a JSON object with ONLY these keys:
+- study_description: verbatim or near-verbatim requirement text (1-3 sentences)
+- requirement_type: one of "FDA PMR 505(o)", "FDA PMR PREA", "FDA PMR CVOT", "FDA PMC 506B", "EMA PASS Category 1", "EMA PASS Category 3", or best match string
+- milestones: array of {{name, date}} objects — names should be "Draft Protocol", "Final Protocol", "Study Completion", "Final Report"; use null for date if not found
+- safety_signal: the specific safety concern (e.g. "medullary thyroid carcinoma", "MACE", "pancreatitis")
+- scientific_justification: 1-2 sentences on why the study is required
+- application_number: BLA/NDA/MAA/EU application number (e.g. "BLA 125469")
+- applicant_name: sponsor/applicant company name
+
+Return ONLY valid JSON, no markdown fences, no other text.
+</instructions>"""
+
+        raw = self._chat(system_prompt, user_message, max_tokens=1024)
+        raw = raw.strip()
+        if raw.startswith("```"):
+            raw = raw.split("```")[1]
+            if raw.startswith("json"):
+                raw = raw[4:]
+        return json.loads(raw.strip())
+
     def regenerate_section(
         self,
         section_id: str,

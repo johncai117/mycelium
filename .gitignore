@@ -52,6 +52,11 @@ chroma_db/
 *.zip
 venture_incubation/
 
+# Non-public reference documents (PDFs, Word docs in docs/)
+docs/*.pdf
+docs/*.docx
+docs/*.doc
+
 # Jupyter
 .ipynb_checkpoints/
 

@@ -11,7 +11,7 @@ load_dotenv()
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s — %(message)s")
 
-from app.api import clarify, retrieve, generate, eval, export, studies
+from app.api import clarify, retrieve, generate, eval, export, studies, upload
 
 # ── Auth ──────────────────────────────────────────────────────────────────────
 
@@ -63,6 +63,7 @@ app.include_router(generate.router, dependencies=[Depends(verify_api_key)])
 app.include_router(eval.router, dependencies=[Depends(verify_api_key)])
 app.include_router(export.router, dependencies=[Depends(verify_api_key)])
 app.include_router(studies.router, dependencies=[Depends(verify_api_key)])
+app.include_router(upload.router, dependencies=[Depends(verify_api_key)])
 
 
 @app.get("/health")

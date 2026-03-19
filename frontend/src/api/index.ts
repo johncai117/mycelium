@@ -9,6 +9,8 @@ import type {
   EvalResult,
   StudyListItem,
   MethodologyRecommendation,
+  RegulatoryDocExtracted,
+  TemplateUploadResponse,
 } from '@/types'
 
 // ── Mock mode ─────────────────────────────────────────────────────────────────
@@ -383,6 +385,55 @@ export async function exportDocx(protocol: Protocol): Promise<Blob> {
   }
   const response = await api.post('/export/docx', { protocol }, { responseType: 'blob' })
   return response.data as Blob
+}
+
+// ── Upload ────────────────────────────────────────────────────────────────────
+
+const MOCK_REGULATORY_DOC_EXTRACTED: RegulatoryDocExtracted = {
+  study_description:
+    'Conduct a post-marketing cardiovascular outcomes trial to assess the risk of major adverse cardiovascular events (MACE) in patients with type 2 diabetes treated with dulaglutide versus placebo, with an upper bound of the 2-sided 95% CI for the MACE risk ratio < 1.3.',
+  requirement_type: 'FDA PMR CVOT',
+  milestones: [
+    { name: 'Draft Protocol', date: '2013-12-31' },
+    { name: 'Final Protocol', date: '2014-06-30' },
+    { name: 'Study Completion', date: '2018-12-31' },
+    { name: 'Final Report', date: '2019-12-31' },
+  ],
+  safety_signal: 'MACE (major adverse cardiovascular events)',
+  scientific_justification:
+    'Required under FDAAA 505(o) to characterize cardiovascular risk for the class of GLP-1 receptor agonists in patients with type 2 diabetes and established or at-risk cardiovascular disease.',
+  application_number: 'BLA 125469',
+  applicant_name: 'Eli Lilly and Company',
+}
+
+export async function uploadRegulatoryDoc(file: File): Promise<RegulatoryDocExtracted> {
+  if (MOCK_MODE) {
+    await delay(1500)
+    return MOCK_REGULATORY_DOC_EXTRACTED
+  }
+  const formData = new FormData()
+  formData.append('file', file)
+  const { data } = await api.post<RegulatoryDocExtracted>(
+    '/upload/regulatory-doc',
+    formData,
+    { headers: { 'Content-Type': 'multipart/form-data' } },
+  )
+  return data
+}
+
+export async function uploadProtocolTemplate(file: File): Promise<TemplateUploadResponse> {
+  if (MOCK_MODE) {
+    await delay(800)
+    return { template_id: 'mock-template-id', filename: file.name, size_bytes: file.size }
+  }
+  const formData = new FormData()
+  formData.append('file', file)
+  const { data } = await api.post<TemplateUploadResponse>(
+    '/upload/protocol-template',
+    formData,
+    { headers: { 'Content-Type': 'multipart/form-data' } },
+  )
+  return data
 }
 
 // ── Studies (in-memory store for MVP — replace with Supabase later) ───────────

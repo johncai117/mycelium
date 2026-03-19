@@ -1,5 +1,3 @@
-// ── Study Input ──────────────────────────────────────────────────────────────
-
 export type StudyType = 'cohort' | 'case_control' | 'cross_sectional' | 'other'
 export type RegulatoryContext = 'PASS' | 'voluntary' | 'investigator_initiated'
 export type MethodologyCategory =
@@ -32,6 +30,33 @@ export type Grade = 'A' | 'B' | 'C' | 'D'
 export type FlagSeverity = 'info' | 'warning' | 'requires_judgment'
 export type SectionStatus = 'ai_generated' | 'edited' | 'approved'
 
+// ── Regulatory document extraction ───────────────────────────────────────────
+
+export interface RegulatoryMilestone {
+  name: string
+  date: string | null
+}
+
+export interface RegulatoryDocExtracted {
+  study_description?: string
+  requirement_type?: string
+  milestones?: RegulatoryMilestone[]
+  safety_signal?: string
+  scientific_justification?: string
+  application_number?: string
+  applicant_name?: string
+}
+
+// ── Template upload ───────────────────────────────────────────────────────────
+
+export interface TemplateUploadResponse {
+  template_id: string
+  filename: string
+  size_bytes: number
+}
+
+// ── Study Input ───────────────────────────────────────────────────────────────
+
 export interface StudyInput {
   drug_name: string
   indication: string
@@ -56,6 +81,10 @@ export interface StudyInput {
   outcome_rarity?: OutcomeRarity
   data_collection?: DataCollection
   time_horizon?: TimeHorizon
+  // Regulatory intake
+  regulatory_requirement_types?: string[]
+  regulatory_doc_extracted?: RegulatoryDocExtracted | null
+  protocol_template_id?: string
 }
 
 // ── Protocol ─────────────────────────────────────────────────────────────────
