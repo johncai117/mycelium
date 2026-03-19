@@ -13,6 +13,8 @@ interface WalkthroughStep {
   target?: string   // CSS selector for element to spotlight
   action?: string   // CTA button label
   position?: 'top' | 'bottom' | 'left' | 'right' | 'center'
+  navigate?: string // route to navigate to when clicking Next/action
+  navigateState?: Record<string, unknown> // state to pass with navigate
 }
 
 interface Props {
@@ -25,54 +27,53 @@ const STEPS: WalkthroughStep[] = [
   {
     title: 'Welcome to Mycelium',
     description:
-      'An AI system for writing PASS pharmacoepidemiology protocols — from blank slate to a full 10-section draft in minutes. Let us show you around.',
+      'The AI system for writing pharmacoepidemiology study protocols. We will walk you through creating your first protocol — it takes about 2 minutes.',
     position: 'center',
     action: 'Start Tour',
+    navigate: '/',
   },
   {
-    title: 'Your Studies',
+    title: 'Your study dashboard',
     description:
-      'This is your study dashboard. All your protocol drafts live here — with their design type, status, and last updated date.',
-    target: '[data-tour="study-header"]',
-    position: 'bottom',
-  },
-  {
-    title: 'New Study',
-    description:
-      'Click here to start a new protocol. You will fill in study details across 4 steps — intake form, data source selection, AI generation, and review.',
+      'All your protocol drafts live here. Click New Study to begin — we will guide you through every step.',
     target: '[data-tour="new-study"]',
     position: 'bottom',
+    navigate: '/study/new',
   },
   {
-    title: 'Upload your PMR or PASS letter',
+    title: 'Step 1 of 4 — Study Inputs',
     description:
-      'On Step 1, upload your FDA PMR or EMA PASS obligation letter. Mycelium extracts the safety signal, milestones, and verbatim study description automatically.',
+      'Fill in the basics: drug name, indication, study type, and regulatory context. On this screen you can also upload your FDA PMR or EMA PASS letter — Mycelium extracts the safety signal and milestones automatically.',
+    target: '[data-tour="study-form"]',
+    position: 'bottom',
+    navigate: '/study/new/data-sources',
+    navigateState: { fromTour: true },
+  },
+  {
+    title: 'Step 2 of 4 — Pick your database',
+    description:
+      'Choose from 278 EMA/HMA-catalogued real-world data sources. Filter by country, coding vocabulary, and outcome capability. Mycelium matches your safety signal to the right database.',
+    position: 'center',
+    navigate: '/',
+  },
+  {
+    title: 'Step 3 of 4 — AI generates your protocol',
+    description:
+      'Mycelium drafts a full 10-section protocol anchored to your regulatory requirement — background, objectives, study design, cohort definition, variable definitions, statistical analysis, and more.',
     position: 'center',
   },
   {
-    title: 'Pick your database',
+    title: 'Step 4 of 4 — ENCePP quality score',
     description:
-      'After the intake form, choose from 278 EMA/HMA-catalogued real-world data sources. Filter by country, coding vocabulary, and outcome capability.',
+      'The built-in ENCePP checker scores your protocol against 29 regulatory quality criteria. Gaps are flagged with suggested edits. Know your submission readiness before you file.',
     position: 'center',
   },
   {
-    title: 'Protocol draft',
+    title: 'You are ready',
     description:
-      'Mycelium generates a full 10-section protocol anchored to your regulatory requirement. Every section is editable, approvable, and tracked.',
+      'Explore two pre-built example studies — a semaglutide PASS and a rofecoxib case-control — to see what a complete protocol looks like.',
     position: 'center',
-  },
-  {
-    title: 'ENCePP score',
-    description:
-      'The built-in ENCePP checker scores your protocol against 29 regulatory quality criteria. Know your submission readiness before you file.',
-    position: 'center',
-  },
-  {
-    title: 'Export to Word',
-    description:
-      'Export to Word with a single click — formatted for regulatory submission. Load sample studies to explore the full workflow.',
-    position: 'center',
-    action: 'Let me try it →',
+    action: 'Load example studies →',
   },
 ]
 
@@ -130,6 +131,10 @@ export function OnboardingModal({ onClose }: Props) {
       dismiss()
       navigate('/')
     } else {
+      const currentStep = STEPS[stepIndex]
+      if (currentStep.navigate) {
+        navigate(currentStep.navigate, { state: currentStep.navigateState })
+      }
       setStepIndex((i) => i + 1)
     }
   }
@@ -140,6 +145,10 @@ export function OnboardingModal({ onClose }: Props) {
 
   function handleAction() {
     if (isFirst) {
+      const currentStep = STEPS[stepIndex]
+      if (currentStep.navigate) {
+        navigate(currentStep.navigate)
+      }
       setStepIndex(1)
     } else if (isLast) {
       seedDemoData()

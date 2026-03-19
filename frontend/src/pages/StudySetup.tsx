@@ -19,7 +19,9 @@ export function StudySetup() {
           </p>
         </div>
 
-        <StudySetupForm onSubmit={handleSubmit} isGenerating={false} />
+        <div data-tour="study-form">
+          <StudySetupForm onSubmit={handleSubmit} isGenerating={false} />
+        </div>
       </div>
     </div>
   )
