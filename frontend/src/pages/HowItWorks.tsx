@@ -51,11 +51,57 @@ function FlowCard({ letter, title, subtitle, children }: FlowCardProps) {
   )
 }
 
+interface BenefitCardProps {
+  icon: string
+  headline: string
+  description: string
+}
+
+function BenefitCard({ icon, headline, description }: BenefitCardProps) {
+  return (
+    <div className="bg-white rounded-xl border border-slate-200 p-5 flex gap-4 shadow-sm">
+      <div className="text-2xl flex-shrink-0 mt-0.5">{icon}</div>
+      <div>
+        <h3 className="font-semibold text-slate-800 text-sm mb-1">{headline}</h3>
+        <p className="text-xs text-slate-500 leading-relaxed">{description}</p>
+      </div>
+    </div>
+  )
+}
+
+const BENEFITS: BenefitCardProps[] = [
+  {
+    icon: '⚡',
+    headline: 'Hours to minutes',
+    description: 'Full PASS study protocol in minutes, not days of manual drafting and internal review cycles.',
+  },
+  {
+    icon: '📋',
+    headline: 'Regulatory-anchored',
+    description: 'Ingests FDA PMR and EMA PASS obligation letters — every protocol section is anchored to the verbatim regulatory requirement.',
+  },
+  {
+    icon: '✅',
+    headline: 'ENCePP-ready',
+    description: 'Built-in 29-item ENCePP checklist QA scores your submission readiness before you send it to the regulator.',
+  },
+  {
+    icon: '🗄️',
+    headline: 'Database-aware',
+    description: '278 EMA/HMA-catalogued real-world data sources with capability matching — picks the right database for your safety signal.',
+  },
+  {
+    icon: '🔍',
+    headline: 'Full audit trail',
+    description: 'Every section stamped AI-generated with confidence level, human-editable with diff tracking for sponsor review.',
+  },
+]
+
 export function HowItWorks() {
   return (
     <div className="max-w-3xl mx-auto px-6 py-12">
       {/* Hero */}
-      <div className="text-center mb-12">
+      <div className="text-center mb-10">
         <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 text-xs font-medium px-3 py-1.5 rounded-full mb-4">
           🧬 Product Guide
         </div>
@@ -64,6 +110,16 @@ export function HowItWorks() {
           Mycelium uses AI to help pharmacoepidemiologists write, evaluate, and export
           PASS protocol documents — in minutes, not days.
         </p>
+      </div>
+
+      {/* Why Mycelium — Benefits */}
+      <div className="mb-12">
+        <h2 className="text-lg font-semibold text-slate-800 mb-4 text-center">Why Mycelium</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {BENEFITS.map((b) => (
+            <BenefitCard key={b.headline} {...b} />
+          ))}
+        </div>
       </div>
 
       {/* Two flows */}
@@ -156,10 +212,10 @@ export function HowItWorks() {
           <div>
             <h2 className="font-semibold text-slate-800 text-base mb-1">What is ENCEPP?</h2>
             <p className="text-sm text-slate-600 leading-relaxed">
-              The <strong>European Network of Centres for Pharmacoepidemiology and Pharmacovigilance</strong> (ENCEPP) 
-              is an EMA initiative that maintains a checklist of 29 methodological criteria for post-authorisation 
-              safety studies (PASS). The checklist ensures protocols meet EMA/HMA standards for transparency, 
-              scientific rigor, and bias control before a study is registered or submitted. 
+              The <strong>European Network of Centres for Pharmacoepidemiology and Pharmacovigilance</strong> (ENCEPP)
+              is an EMA initiative that maintains a checklist of 29 methodological criteria for post-authorisation
+              safety studies (PASS). The checklist ensures protocols meet EMA/HMA standards for transparency,
+              scientific rigor, and bias control before a study is registered or submitted.
               Mycelium's evaluation feature automatically scores your protocol against all 29 items.
             </p>
           </div>
