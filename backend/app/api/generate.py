@@ -53,6 +53,61 @@ def _load_prompt(name: str, methodology: str | None = None) -> str:
     return base
 
 
+def build_regulatory_context(study_input: StudyInput) -> str:
+    """Return a formatted regulatory context block when regulatory_doc_extracted is present."""
+    doc = study_input.regulatory_doc_extracted
+    if not doc:
+        return ""
+
+    lines = [
+        "REGULATORY REQUIREMENT CONTEXT",
+        "===============================",
+    ]
+
+    req_type = doc.get("requirement_type", "")
+    if req_type:
+        lines.append(f"Requirement type: {req_type}")
+
+    app_num = doc.get("application_number", "")
+    applicant = doc.get("applicant_name", "")
+    if app_num or applicant:
+        app_str = f"Application: {app_num}" if app_num else "Application: (unknown)"
+        if applicant:
+            app_str += f" ({applicant})"
+        lines.append(app_str)
+
+    safety_signal = doc.get("safety_signal", "")
+    if safety_signal:
+        lines.append(f"Safety signal: {safety_signal}")
+
+    study_desc = doc.get("study_description", "")
+    if study_desc:
+        lines.append(f"Required study description: {study_desc}")
+
+    sci_just = doc.get("scientific_justification", "")
+    if sci_just:
+        lines.append(f"Scientific justification: {sci_just}")
+
+    milestones = doc.get("milestones", [])
+    if milestones:
+        lines.append("Mandatory milestones:")
+        for m in milestones:
+            name = m.get("name", "") if isinstance(m, dict) else str(m)
+            date = m.get("date") if isinstance(m, dict) else None
+            lines.append(f"  - {name}: {date or 'date not specified'}")
+
+    if study_input.regulatory_requirement_types:
+        lines.append(f"Regulatory requirement types: {', '.join(study_input.regulatory_requirement_types)}")
+
+    if study_input.study_scope:
+        lines.append(f"Study scope: {', '.join(study_input.study_scope)}")
+
+    if study_input.selected_data_sources:
+        lines.append(f"Selected data sources: {', '.join(study_input.selected_data_sources)}")
+
+    return "\n".join(lines)
+
+
 def _confidence_from_inputs(section_name: str, inputs: StudyInput) -> str:
     if section_name == "cohort_definition" and inputs.index_date_logic:
         return "high"
@@ -94,6 +149,7 @@ async def generate_protocol(request: GenerateRequest):
         prior_sections = {}
         methodology = request.study_inputs.methodology
         skip_sections = SECTION_SKIP.get(methodology, set()) if methodology else set()
+        regulatory_context = build_regulatory_context(request.study_inputs)
 
         for section_name in SECTION_ORDER:
             if section_name in skip_sections:
@@ -111,6 +167,7 @@ async def generate_protocol(request: GenerateRequest):
                 system_prompt=prompt,
                 prior_sections=prior_sections if prior_sections else None,
                 section_display_label=display_label,
+                regulatory_context=regulatory_context or None,
             )
             confidence = _confidence_from_inputs(section_name, request.study_inputs)
             sections[section_name] = ProtocolSection(

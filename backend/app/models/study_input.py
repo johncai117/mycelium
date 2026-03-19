@@ -46,3 +46,4 @@ class StudyInput(BaseModel):
     regulatory_doc_extracted: Optional[dict[str, Any]] = None
     protocol_template_id: Optional[str] = None
     study_scope: list[str] = []
+    selected_data_sources: list[str] = []

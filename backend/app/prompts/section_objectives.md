@@ -20,3 +20,8 @@ Writing guidelines:
 - Each objective should be actionable and measurable
 - Avoid vague language ("to explore", "to investigate") — use "to estimate", "to compare", "to quantify"
 - Length: 200–350 words
+
+If a REGULATORY REQUIREMENT CONTEXT block is present in this prompt, the primary objective MUST directly mirror the regulatory requirement. Specifically:
+- The primary objective must name the safety signal exactly as defined in the regulatory context (e.g., if the PMR requires assessing MACE, the primary objective must state MACE as defined in the PMR).
+- Reference the requirement type (e.g., FDA PMR 505(o), EMA PASS Category 1) to clarify the regulatory mandate driving this objective.
+- Secondary objectives should address any additional outcomes or subgroups implied by the regulatory document's study description.

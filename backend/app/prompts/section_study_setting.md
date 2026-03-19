@@ -21,3 +21,5 @@ Writing guidelines:
 - If the data source is not recognized, describe it based on available context
 - Include a statement about data access and governance (IRB/DUA — details in ethics section)
 - Do not describe analysis methods here — save for data analysis section
+
+If a REGULATORY REQUIREMENT CONTEXT block is present in this prompt, use the "Selected data sources" field to name the actual databases for this study. Describe each listed data source accurately and explain why it is appropriate for addressing the specific safety signal identified in the regulatory requirement.
