@@ -39,6 +39,7 @@ export function StudySetupForm({ onSubmit, isGenerating }: Props) {
     setMethodologyRecommendation,
     selectedMethodology,
     selectMethodology,
+    setRegulatoryDocExtracted,
   } = useStudyForm()
 
   const [clarifyLoading, setClarifyLoading] = useState(false)
@@ -147,7 +148,12 @@ export function StudySetupForm({ onSubmit, isGenerating }: Props) {
           {STEPS[currentStep - 1].label}
         </h2>
 
-        {currentStep === 1 && <Step1CoreInputs form={form} />}
+        {currentStep === 1 && (
+          <Step1CoreInputs
+            form={form}
+            onRegulatoryDocConfirmed={setRegulatoryDocExtracted}
+          />
+        )}
         {currentStep === 2 && <Step2DesignDetails form={form} />}
         {currentStep === 3 && <Step3ClinicalContext form={form} />}
         {currentStep === 4 && (

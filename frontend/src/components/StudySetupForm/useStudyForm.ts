@@ -8,6 +8,7 @@ import type {
   MethodologyRecommendation,
   MethodologyCategory,
   MethodologyConfidence,
+  RegulatoryDocExtracted,
 } from '@/types'
 
 export const studyInputSchema = z.object({
@@ -37,6 +38,9 @@ export const studyInputSchema = z.object({
   outcome_rarity: z.enum(['common', 'uncommon', 'rare', 'very_rare']).optional(),
   data_collection: z.enum(['claims_ehr', 'registry', 'survey', 'prospective']).optional(),
   time_horizon: z.enum(['acute', 'subacute', 'chronic']).optional(),
+  // Regulatory intake
+  regulatory_requirement_types: z.array(z.string()).optional(),
+  protocol_template_id: z.string().optional(),
 })
 
 export type StudyFormValues = z.infer<typeof studyInputSchema>
@@ -52,6 +56,8 @@ export function useStudyForm() {
     useState<MethodologyCategory | null>(null)
   const [methodologyConfidence, setMethodologyConfidence] =
     useState<MethodologyConfidence | null>(null)
+  const [regulatoryDocExtracted, setRegulatoryDocExtracted] =
+    useState<RegulatoryDocExtracted | null>(null)
 
   const form = useForm<StudyFormValues>({
     resolver: zodResolver(studyInputSchema),
@@ -80,6 +86,10 @@ export function useStudyForm() {
     if (selectedMethodology) {
       merged.methodology = selectedMethodology
       merged.methodology_confidence = methodologyConfidence ?? 'recommended'
+    }
+    // Attach confirmed regulatory document extraction
+    if (regulatoryDocExtracted) {
+      merged.regulatory_doc_extracted = regulatoryDocExtracted
     }
     return merged
   }
@@ -114,5 +124,7 @@ export function useStudyForm() {
     setMethodologyRecommendation,
     selectedMethodology,
     selectMethodology,
+    regulatoryDocExtracted,
+    setRegulatoryDocExtracted,
   }
 }

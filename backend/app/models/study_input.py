@@ -1,4 +1,4 @@
-from typing import Literal, Optional
+from typing import Any, Literal, Optional
 from pydantic import BaseModel
 
 
@@ -40,3 +40,8 @@ class StudyInput(BaseModel):
     outcome_rarity: Optional[Literal["common", "uncommon", "rare", "very_rare"]] = None
     data_collection: Optional[Literal["claims_ehr", "registry", "survey", "prospective"]] = None
     time_horizon: Optional[Literal["acute", "subacute", "chronic"]] = None
+
+    # Regulatory intake fields
+    regulatory_requirement_types: list[str] = []
+    regulatory_doc_extracted: Optional[dict[str, Any]] = None
+    protocol_template_id: Optional[str] = None
