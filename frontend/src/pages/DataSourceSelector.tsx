@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { Check, X, ExternalLink, ChevronDown, Loader2 } from 'lucide-react'
+import { isAxiosError } from 'axios'
 import { DATA_SOURCES, SOURCE_TYPES, CARE_SETTINGS, COUNTRIES, CODING_VOCABS } from '@/data/dataSourceCatalog'
 import { generateProtocol, retrieveProtocols, createStudy, saveProtocol } from '@/api'
 import type { StudyInput, Protocol, EMADataSource } from '@/types'
@@ -283,6 +284,7 @@ export function DataSourceSelector() {
   const [selectedNames, setSelectedNames] = useState<string[]>([])
   const [isGenerating, setIsGenerating] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [backendUnavailable, setBackendUnavailable] = useState(false)
 
   const filteredSources = useMemo(() => {
     return DATA_SOURCES.filter((s) => {
@@ -322,10 +324,11 @@ export function DataSourceSelector() {
     )
   }
 
-  const handleProceed = async (withSources: boolean) => {
+  const handleProceed = async (withSources: boolean, forceDemo = false) => {
     if (!inputs) return
     setIsGenerating(true)
     setError(null)
+    setBackendUnavailable(false)
     try {
       const finalInputs: StudyInput = withSources
         ? { ...inputs, selected_data_sources: selectedNames }
@@ -334,12 +337,12 @@ export function DataSourceSelector() {
       const study = createStudy(finalInputs)
       let chunks: ReturnType<typeof Array.prototype.slice> = []
       try {
-        chunks = await retrieveProtocols(finalInputs)
+        chunks = await retrieveProtocols(finalInputs, forceDemo)
       } catch {
         // RAG unavailable — continue without retrieval
       }
 
-      const result = await generateProtocol(finalInputs, chunks as never)
+      const result = await generateProtocol(finalInputs, chunks as never, forceDemo)
       const protocol: Protocol = {
         study_id: study.id,
         study_inputs: finalInputs,
@@ -353,8 +356,23 @@ export function DataSourceSelector() {
       saveProtocol(protocol)
       navigate(`/study/${study.id}/draft`)
     } catch (e) {
-      const msg = e instanceof Error ? e.message : 'Generation failed'
-      setError(`Error: ${msg}. Make sure the backend is running and ANTHROPIC_API_KEY is set.`)
+      let errorMsg: string
+      if (isAxiosError(e)) {
+        if (e.code === 'ERR_NETWORK' || e.message === 'Network Error') {
+          setBackendUnavailable(true)
+          errorMsg = `Cannot reach the backend at ${import.meta.env.VITE_API_URL || 'http://localhost:8000'}. Make sure the backend server is running.`
+        } else if (e.response?.status === 401) {
+          errorMsg = `Authentication failed (401). Check that VITE_API_KEY in frontend/.env matches DEMO_API_KEY on the backend.`
+        } else if (e.response?.status === 500) {
+          const detail = (e.response?.data as { detail?: string })?.detail || e.message
+          errorMsg = `Backend error: ${detail}`
+        } else {
+          errorMsg = `API error (${e.response?.status ?? 'unknown'}): ${e.message}`
+        }
+      } else {
+        errorMsg = e instanceof Error ? e.message : 'Generation failed'
+      }
+      setError(errorMsg)
       setIsGenerating(false)
     }
   }
@@ -392,8 +410,16 @@ export function DataSourceSelector() {
 
         {/* Error */}
         {error && (
-          <div className="mb-4 rounded-lg bg-red-50 border border-red-200 px-4 py-3">
+          <div className="mb-4 rounded-lg bg-red-50 border border-red-200 px-4 py-3 flex items-start justify-between gap-4">
             <p className="text-sm text-red-700">{error}</p>
+            {backendUnavailable && (
+              <button
+                onClick={() => handleProceed(selectedNames.length > 0, true)}
+                className="shrink-0 rounded-md bg-slate-700 px-3 py-1.5 text-xs font-medium text-white hover:bg-slate-800 whitespace-nowrap"
+              >
+                Continue with demo data
+              </button>
+            )}
           </div>
         )}
 
