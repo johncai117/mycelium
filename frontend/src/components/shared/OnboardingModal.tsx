@@ -44,7 +44,6 @@ const STEPS: WalkthroughStep[] = [
     title: 'Step 1 of 4 — Study Inputs',
     description:
       'Fill in the basics: drug name, indication, study type, and regulatory context. On this screen you can also upload your FDA PMR or EMA PASS letter — Mycelium extracts the safety signal and milestones automatically.',
-    target: '[data-tour="study-form"]',
     position: 'center',
     navigate: '/study/new/data-sources',
     navigateState: { fromTour: true },
