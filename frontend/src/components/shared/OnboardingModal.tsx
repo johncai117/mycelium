@@ -301,70 +301,92 @@ export function OnboardingModal({ onClose }: Props) {
       )}
 
       {/* Tooltip card */}
-      <div
-        className="absolute z-10 bg-white rounded-2xl shadow-xl border border-slate-200 p-5"
-        style={getTooltipStyle()}
-      >
-        {/* Header row: step counter + close */}
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-xs font-medium text-slate-400">
-            {stepIndex + 1} of {STEPS.length}
-          </span>
-          <button
-            onClick={dismiss}
-            className="text-slate-300 hover:text-slate-500 transition-colors"
-            aria-label="Close tour"
+      {(() => {
+        const cardContents = (
+          <>
+            {/* Header row: step counter + close */}
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-medium text-slate-400">
+                {stepIndex + 1} of {STEPS.length}
+              </span>
+              <button
+                onClick={dismiss}
+                className="text-slate-300 hover:text-slate-500 transition-colors"
+                aria-label="Close tour"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <h3 className="font-semibold text-slate-900 text-base mb-1.5">{step.title}</h3>
+            <p className="text-sm text-slate-500 leading-relaxed mb-4">{step.description}</p>
+
+            {/* Progress dots */}
+            <div className="flex gap-1.5 mb-4">
+              {STEPS.map((_, i) => (
+                <div
+                  key={i}
+                  className={`h-1.5 rounded-full transition-all duration-200 ${
+                    i === stepIndex
+                      ? 'bg-blue-600 w-4'
+                      : i < stepIndex
+                      ? 'bg-blue-200 w-1.5'
+                      : 'bg-slate-200 w-1.5'
+                  }`}
+                />
+              ))}
+            </div>
+
+            {/* Action row */}
+            <div className="flex items-center gap-2">
+              {isFirst ? (
+                <button
+                  onClick={dismiss}
+                  className="flex-none rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-500 hover:bg-slate-50 transition-colors"
+                >
+                  Skip
+                </button>
+              ) : (
+                <button
+                  onClick={handlePrev}
+                  className="flex-none rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors"
+                >
+                  ← Back
+                </button>
+              )}
+              <button
+                onClick={step.action ? handleAction : handleNext}
+                className="flex-1 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700 transition-colors"
+              >
+                {step.action ?? (isLast ? 'Finish' : 'Next →')}
+              </button>
+            </div>
+          </>
+        )
+
+        if (!hasTarget) {
+          // Center mode: flex-centered, safe for iOS viewport
+          return (
+            <div className="fixed inset-0 z-10 flex items-center justify-center p-6 pointer-events-none">
+              <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-5 pointer-events-auto w-full max-w-xs max-h-[calc(100vh-48px)] overflow-y-auto">
+                {cardContents}
+              </div>
+            </div>
+          )
+        }
+
+        // Spotlight mode: absolutely positioned near target element
+        return (
+          <div
+            className="absolute z-10 bg-white rounded-2xl shadow-xl border border-slate-200 p-5"
+            style={getTooltipStyle()}
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-
-        <h3 className="font-semibold text-slate-900 text-base mb-1.5">{step.title}</h3>
-        <p className="text-sm text-slate-500 leading-relaxed mb-4">{step.description}</p>
-
-        {/* Progress dots */}
-        <div className="flex gap-1.5 mb-4">
-          {STEPS.map((_, i) => (
-            <div
-              key={i}
-              className={`h-1.5 rounded-full transition-all duration-200 ${
-                i === stepIndex
-                  ? 'bg-blue-600 w-4'
-                  : i < stepIndex
-                  ? 'bg-blue-200 w-1.5'
-                  : 'bg-slate-200 w-1.5'
-              }`}
-            />
-          ))}
-        </div>
-
-        {/* Action row */}
-        <div className="flex items-center gap-2">
-          {isFirst ? (
-            <button
-              onClick={dismiss}
-              className="flex-none rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-500 hover:bg-slate-50 transition-colors"
-            >
-              Skip
-            </button>
-          ) : (
-            <button
-              onClick={handlePrev}
-              className="flex-none rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors"
-            >
-              ← Back
-            </button>
-          )}
-          <button
-            onClick={step.action ? handleAction : handleNext}
-            className="flex-1 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700 transition-colors"
-          >
-            {step.action ?? (isLast ? 'Finish' : 'Next →')}
-          </button>
-        </div>
-      </div>
+            {cardContents}
+          </div>
+        )
+      })()}
     </div>
   )
 }
