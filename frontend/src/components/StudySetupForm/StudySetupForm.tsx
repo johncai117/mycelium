@@ -142,7 +142,7 @@ export function StudySetupForm({ onSubmit, isGenerating }: Props) {
         ))}
       </div>
 
-      {/* Nav row — always visible at top */}
+      {/* Nav row — always visible at top of card */}
       <div className="flex justify-between items-center mb-4">
         <button
           type="button"
@@ -181,7 +181,7 @@ export function StudySetupForm({ onSubmit, isGenerating }: Props) {
         )}
       </div>
 
-      {/* Card — simple, normal flow */}
+      {/* Step content card */}
       <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="text-base font-semibold text-slate-800 mb-5">
           {STEPS[currentStep - 1].label}
