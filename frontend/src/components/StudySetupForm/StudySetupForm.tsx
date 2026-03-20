@@ -142,85 +142,79 @@ export function StudySetupForm({ onSubmit, isGenerating }: Props) {
         ))}
       </div>
 
-      {/* Card with scrollable content + pinned nav footer */}
-      <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-        {/* Scrollable step content */}
-        <div
-          className="p-6 overflow-y-auto"
-          style={{ maxHeight: 'calc(100vh - 320px)', minHeight: 240 }}
+      {/* Nav row — always visible at top */}
+      <div className="flex justify-between items-center mb-4">
+        <button
+          type="button"
+          onClick={prevStep}
+          disabled={currentStep === 1}
+          className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          <h2 className="text-base font-semibold text-slate-800 mb-5">
-            {STEPS[currentStep - 1].label}
-          </h2>
+          Back
+        </button>
 
-          {currentStep === 1 && (
-            <Step1CoreInputs
-              form={form}
-              onRegulatoryDocConfirmed={setRegulatoryDocExtracted}
-            />
-          )}
-          {currentStep === 2 && <Step2DesignDetails form={form} />}
-          {currentStep === 3 && <Step3ClinicalContext form={form} />}
-          {currentStep === 4 && (
-            <Step4FollowUpQuestions
-              isLoading={clarifyLoading}
-              isSufficient={isSufficient}
-              questions={clarifyQuestions}
-              answers={clarifyAnswers}
-              onAnswerChange={(field, val) =>
-                setClarifyAnswers((prev) => ({ ...prev, [field]: val }))
-              }
-              requiredAnswered={requiredQuestionsAnswered}
-              methodologyLoading={methodologyLoading}
-              methodologyRecommendation={methodologyRecommendation}
-              selectedMethodology={selectedMethodology}
-              onMethodologySelect={selectMethodology}
-            />
-          )}
-
-          {clarifyError && (
-            <p className="mt-3 text-xs text-amber-600">{clarifyError}</p>
-          )}
-        </div>
-
-        {/* Pinned nav footer */}
-        <div className="flex justify-between px-6 py-4 border-t border-slate-100 bg-white">
+        {currentStep < 4 ? (
           <button
             type="button"
-            onClick={prevStep}
-            disabled={currentStep === 1}
-            className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
+            onClick={handleNext}
+            disabled={!canProceed()}
+            className="rounded-md bg-blue-600 px-5 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            Back
+            Continue
           </button>
+        ) : (
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={!canProceed() || isGenerating}
+            className="rounded-md bg-blue-600 px-6 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
+          >
+            {isGenerating ? (
+              <>
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                Generating Protocol...
+              </>
+            ) : (
+              'Generate Protocol'
+            )}
+          </button>
+        )}
+      </div>
 
-          {currentStep < 4 ? (
-            <button
-              type="button"
-              onClick={handleNext}
-              disabled={!canProceed()}
-              className="rounded-md bg-blue-600 px-5 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              Continue
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={handleSubmit}
-              disabled={!canProceed() || isGenerating}
-              className="rounded-md bg-blue-600 px-6 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
-            >
-              {isGenerating ? (
-                <>
-                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                  Generating Protocol...
-                </>
-              ) : (
-                'Generate Protocol'
-              )}
-            </button>
-          )}
-        </div>
+      {/* Card — simple, normal flow */}
+      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 className="text-base font-semibold text-slate-800 mb-5">
+          {STEPS[currentStep - 1].label}
+        </h2>
+
+        {currentStep === 1 && (
+          <Step1CoreInputs
+            form={form}
+            onRegulatoryDocConfirmed={setRegulatoryDocExtracted}
+          />
+        )}
+        {currentStep === 2 && <Step2DesignDetails form={form} />}
+        {currentStep === 3 && <Step3ClinicalContext form={form} />}
+        {currentStep === 4 && (
+          <Step4FollowUpQuestions
+            isLoading={clarifyLoading}
+            isSufficient={isSufficient}
+            questions={clarifyQuestions}
+            answers={clarifyAnswers}
+            onAnswerChange={(field, val) =>
+              setClarifyAnswers((prev) => ({ ...prev, [field]: val }))
+            }
+            requiredAnswered={requiredQuestionsAnswered}
+            methodologyLoading={methodologyLoading}
+            methodologyRecommendation={methodologyRecommendation}
+            selectedMethodology={selectedMethodology}
+            onMethodologySelect={selectMethodology}
+          />
+        )}
+
+        {clarifyError && (
+          <p className="mt-3 text-xs text-amber-600">{clarifyError}</p>
+        )}
       </div>
     </div>
   )
