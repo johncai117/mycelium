@@ -90,9 +90,9 @@ export function StudySetupForm({ onSubmit, isGenerating }: Props) {
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="max-w-2xl mx-auto flex flex-col flex-1 min-h-0">
       {/* Load example study */}
-      <div className="flex items-center gap-3 mb-6">
+      <div className="flex items-center gap-3 mb-6 flex-shrink-0">
         <button
           type="button"
           onClick={() => form.reset(EXAMPLE_STUDY_INPUT)}
@@ -104,7 +104,7 @@ export function StudySetupForm({ onSubmit, isGenerating }: Props) {
       </div>
 
       {/* Progress indicator */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-8 flex-shrink-0">
         {STEPS.map((step, i) => (
           <div key={step.number} className="flex items-center flex-1">
             <div className="flex flex-col items-center">
@@ -143,12 +143,9 @@ export function StudySetupForm({ onSubmit, isGenerating }: Props) {
       </div>
 
       {/* Card with scrollable content + pinned nav footer */}
-      <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+      <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden flex flex-col flex-1 min-h-0">
         {/* Scrollable step content */}
-        <div
-          className="p-6 overflow-y-auto"
-          style={{ maxHeight: 'calc(100vh - 320px)', minHeight: 240 }}
-        >
+        <div className="p-6 overflow-y-auto flex-1 min-h-0">
           <h2 className="text-base font-semibold text-slate-800 mb-5">
             {STEPS[currentStep - 1].label}
           </h2>
@@ -184,7 +181,7 @@ export function StudySetupForm({ onSubmit, isGenerating }: Props) {
         </div>
 
         {/* Pinned nav footer */}
-        <div className="flex justify-between px-6 py-4 border-t border-slate-100 bg-white">
+        <div className="flex justify-between px-6 py-4 border-t border-slate-100 bg-white flex-shrink-0">
           <button
             type="button"
             onClick={prevStep}

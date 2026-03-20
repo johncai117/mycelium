@@ -67,16 +67,18 @@ export default function App() {
   )
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="h-screen flex flex-col overflow-hidden bg-slate-50">
       <MockBanner />
       <Nav onTakeTour={() => setShowOnboarding(true)} />
-      <Routes>
-        <Route path="/" element={<StudyList onTakeTour={() => setShowOnboarding(true)} />} />
-        <Route path="/study/new" element={<StudySetup />} />
-        <Route path="/study/new/data-sources" element={<DataSourceSelector />} />
-        <Route path="/study/:id/draft" element={<ProtocolDraft />} />
-        <Route path="/how-it-works" element={<HowItWorks />} />
-      </Routes>
+      <div className="flex-1 overflow-y-auto min-h-0">
+        <Routes>
+          <Route path="/" element={<StudyList onTakeTour={() => setShowOnboarding(true)} />} />
+          <Route path="/study/new" element={<StudySetup />} />
+          <Route path="/study/new/data-sources" element={<DataSourceSelector />} />
+          <Route path="/study/:id/draft" element={<ProtocolDraft />} />
+          <Route path="/how-it-works" element={<HowItWorks />} />
+        </Routes>
+      </div>
       {showOnboarding && <OnboardingModal onClose={() => setShowOnboarding(false)} />}
     </div>
   )
