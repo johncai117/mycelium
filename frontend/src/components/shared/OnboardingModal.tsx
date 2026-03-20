@@ -45,7 +45,7 @@ const STEPS: WalkthroughStep[] = [
     description:
       'Fill in the basics: drug name, indication, study type, and regulatory context. On this screen you can also upload your FDA PMR or EMA PASS letter — Mycelium extracts the safety signal and milestones automatically.',
     target: '[data-tour="study-form"]',
-    position: 'bottom',
+    position: 'center',
     navigate: '/study/new/data-sources',
     navigateState: { fromTour: true },
   },
@@ -228,13 +228,18 @@ export function OnboardingModal({ onClose }: Props) {
           right: window.innerWidth - (targetRect.left - PAD - GAP),
           width: CARD_W,
         }
-      default: // bottom
+      default: { // bottom
+        const CARD_H = 240
+        const rawTop = targetRect.bottom + PAD + GAP
+        const clampedTop = Math.min(rawTop, window.innerHeight - CARD_H - 16)
+        const finalTop = Math.max(16, clampedTop)
         return {
           position: 'absolute',
-          top: targetRect.bottom + PAD + GAP,
+          top: finalTop,
           left: clampedLeft,
           width: CARD_W,
         }
+      }
     }
   }
 
