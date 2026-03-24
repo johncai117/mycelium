@@ -140,7 +140,7 @@ export function ProtocolSectionView({
       setEditContent(result.content)
       onUpdate(sectionKey, { ...section, content: result.content, status: 'edited', ai_generated: true })
     } catch {
-      setRegenError('Regeneration failed. Check your API key and try again.')
+      setRegenError('Regeneration failed. Check that the backend is running at http://localhost:8000.')
     } finally {
       setIsRegenerating(false)
     }
