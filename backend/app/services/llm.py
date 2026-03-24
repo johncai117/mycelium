@@ -1,4 +1,5 @@
 import json
+import os
 import time
 import logging
 import urllib.request
@@ -12,9 +13,29 @@ from app.models.methodology import METHODOLOGY_REGISTRY, MethodologyCategory
 
 logger = logging.getLogger(__name__)
 
-MODEL = "qwen3.5:9b"
+# ---------------------------------------------------------------------------
+# Provider configuration
+# Set LLM_PROVIDER=claude or LLM_PROVIDER=ollama in your .env
+# Defaults to claude if ANTHROPIC_API_KEY is present, otherwise ollama
+# ---------------------------------------------------------------------------
+OLLAMA_MODEL = "qwen3.5:9b"
+CLAUDE_MODEL = "claude-sonnet-4-6"
 OLLAMA_BASE_URL = "http://localhost:11434"
 PROMPTS_DIR = Path(__file__).parent.parent / "prompts"
+
+_anthropic_key = os.environ.get("ANTHROPIC_API_KEY", "")
+_provider_env = os.environ.get("LLM_PROVIDER", "").lower()
+
+if _provider_env in ("claude", "anthropic"):
+    LLM_PROVIDER = "claude"
+elif _provider_env == "ollama":
+    LLM_PROVIDER = "ollama"
+elif _anthropic_key:
+    LLM_PROVIDER = "claude"
+else:
+    LLM_PROVIDER = "ollama"
+
+logger.info(f"LLM provider: {LLM_PROVIDER} (model: {CLAUDE_MODEL if LLM_PROVIDER == 'claude' else OLLAMA_MODEL})")
 
 
 def _load_prompt(name: str) -> str:
@@ -40,12 +61,40 @@ def _call_with_backoff(fn, max_retries: int = 3):
 class LLMService:
     def __init__(self):
         self.base_url = OLLAMA_BASE_URL
+        self.provider = LLM_PROVIDER
 
     def _chat(self, system: str, user: str, max_tokens: int = 2048) -> str:
+        """Route to the configured LLM provider, with automatic Ollama fallback."""
+        if self.provider == "claude":
+            try:
+                return self._chat_claude(system, user, max_tokens)
+            except Exception as e:
+                logger.warning(f"Claude call failed ({e}), falling back to Ollama...")
+                return self._chat_ollama(system, user, max_tokens)
+        else:
+            return self._chat_ollama(system, user, max_tokens)
+
+    def _chat_claude(self, system: str, user: str, max_tokens: int = 2048) -> str:
+        """Call Anthropic Claude API."""
+        import anthropic
+
+        def call():
+            client = anthropic.Anthropic(api_key=_anthropic_key)
+            message = client.messages.create(
+                model=CLAUDE_MODEL,
+                max_tokens=max_tokens,
+                system=system,
+                messages=[{"role": "user", "content": user}],
+            )
+            return message.content[0].text
+
+        return _call_with_backoff(call)
+
+    def _chat_ollama(self, system: str, user: str, max_tokens: int = 2048) -> str:
         """Call Ollama native API with think=false to get direct output."""
         def call():
             payload = json.dumps({
-                "model": MODEL,
+                "model": OLLAMA_MODEL,
                 "think": False,
                 "stream": False,
                 "options": {"num_predict": max_tokens},
