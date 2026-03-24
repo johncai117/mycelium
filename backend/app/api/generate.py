@@ -1,8 +1,10 @@
 import uuid
 import logging
 from pathlib import Path
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
+
+from app.middleware.auth import get_current_user
 
 from app.models.study_input import StudyInput
 from app.models.protocol import Protocol, ProtocolSection, CodeSets, ProtocolFlag
@@ -142,7 +144,7 @@ class GenerateResponse(BaseModel):
 
 
 @router.post("/generate", response_model=GenerateResponse)
-async def generate_protocol(request: GenerateRequest):
+async def generate_protocol(request: GenerateRequest, current_user: dict = Depends(get_current_user)):
     try:
         sections = {}
         flags = []
@@ -202,7 +204,7 @@ async def generate_protocol(request: GenerateRequest):
 
 
 @router.post("/generate/section")
-async def regenerate_section(request: RegenerateRequest):
+async def regenerate_section(request: RegenerateRequest, current_user: dict = Depends(get_current_user)):
     try:
         new_content = llm.regenerate_section(
             section_id=request.section_id,

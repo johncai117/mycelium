@@ -16,8 +16,10 @@ import uuid
 from datetime import datetime
 from typing import Any
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
+
+from app.middleware.auth import get_current_user
 
 from app.models.study_input import StudyInput
 from app.models.protocol import Protocol, ProtocolSection, CodeSets
@@ -56,7 +58,7 @@ class SaveProtocolRequest(BaseModel):
 # ── Routes ────────────────────────────────────────────────────────────────────
 
 @router.get("/studies", response_model=list[StudyListItem])
-async def list_studies():
+async def list_studies(current_user: dict = Depends(get_current_user)):
     """Return all studies sorted by updated_at descending."""
     items = []
     for study_id, protocol in _STORE.items():
@@ -74,7 +76,7 @@ async def list_studies():
 
 
 @router.post("/studies", response_model=StudyListItem, status_code=201)
-async def create_study(request: CreateStudyRequest):
+async def create_study(request: CreateStudyRequest, current_user: dict = Depends(get_current_user)):
     """Create a new empty study record."""
     study_id = str(uuid.uuid4())
     now = datetime.utcnow()
@@ -101,7 +103,7 @@ async def create_study(request: CreateStudyRequest):
 
 
 @router.get("/studies/{study_id}", response_model=Protocol)
-async def get_study(study_id: str):
+async def get_study(study_id: str, current_user: dict = Depends(get_current_user)):
     """Get a study protocol by ID."""
     protocol = _STORE.get(study_id)
     if not protocol:
@@ -110,7 +112,7 @@ async def get_study(study_id: str):
 
 
 @router.put("/studies/{study_id}", response_model=Protocol)
-async def update_study(study_id: str, request: UpdateStudyRequest):
+async def update_study(study_id: str, request: UpdateStudyRequest, current_user: dict = Depends(get_current_user)):
     """Update study inputs for an existing study."""
     protocol = _STORE.get(study_id)
     if not protocol:
@@ -122,7 +124,7 @@ async def update_study(study_id: str, request: UpdateStudyRequest):
 
 
 @router.post("/studies/{study_id}/protocol")
-async def save_protocol(study_id: str, request: SaveProtocolRequest):
+async def save_protocol(study_id: str, request: SaveProtocolRequest, current_user: dict = Depends(get_current_user)):
     """Save a full protocol (after generation) to the store."""
     request.protocol.study_id = study_id
     request.protocol.updated_at = datetime.utcnow()
@@ -131,7 +133,7 @@ async def save_protocol(study_id: str, request: SaveProtocolRequest):
 
 
 @router.get("/studies/{study_id}/versions")
-async def get_versions(study_id: str):
+async def get_versions(study_id: str, current_user: dict = Depends(get_current_user)):
     """Return version history for a study (stub — returns current version only)."""
     protocol = _STORE.get(study_id)
     if not protocol:
