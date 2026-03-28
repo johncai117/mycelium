@@ -1,122 +1,120 @@
-import logging
-import os
+"""
+retrieval.py — Updated ChromaDB retrieval service for Anchorage
+===================================================================
+
+Adds:
+- retrieve_for_section() - section-specific retrieval for protocol generation
+- retrieve_amendment_rationale() - queries chunk_type='amendment_rationale'
+- _dedupe_latest() - keeps most recent version per study_id+section
+- Voyage AI embeddings (preferred), OpenAI fallback
+- Full implementation replaces original retrieval.py
+"""
+
+from __future__ import annotations
+import logging, os
+from dataclasses import dataclass
 from typing import Optional
+import chromadb
+from chromadb.utils.embedding_functions import EmbeddingFunction
 
-from app.models.study_input import StudyInput
+log = logging.getLogger(__name__)
+COLLECTION_NAME = "protocols"
 
-logger = logging.getLogger(__name__)
 
-
+@dataclass
 class RetrievedChunk:
-    def __init__(self, chunk: str, source_title: str, source_eu_pas: str, score: float, section: str):
-        self.chunk = chunk
-        self.source_title = source_title
-        self.source_eu_pas = source_eu_pas
-        self.score = score
-        self.section = section
-
-    def to_dict(self) -> dict:
-        return {
-            "chunk": self.chunk,
-            "source_title": self.source_title,
-            "source_eu_pas": self.source_eu_pas,
-            "score": self.score,
-            "section": self.section,
-        }
+    text: str
+    source_file: str
+    study_id: str
+    section_label: str
+    chunk_type: str
+    version_number: str
+    is_amendment: bool
+    amendment_order: int
+    score: float
+    metadata: dict
 
 
-class RetrievalService:
-    def __init__(self):
-        self._client = None
-        self._collection = None
-
-    def _get_collection(self):
-        if self._collection is not None:
-            return self._collection
+def _get_embedding_fn() -> EmbeddingFunction:
+    voyage_key = os.environ.get("VOYAGE_API_KEY")
+    if voyage_key:
         try:
-            import chromadb
-            chroma_path = os.getenv("CHROMA_DB_PATH", "./backend/chroma_db")
-            self._client = chromadb.PersistentClient(path=chroma_path)
-            self._collection = self._client.get_or_create_collection(
-                name="protocols",
-                metadata={"hnsw:space": "cosine"},
-            )
-            return self._collection
+            import voyageai
+            class VoyageEF(EmbeddingFunction):
+                def __init__(self):
+                    self._client = voyageai.Client(api_key=voyage_key)
+                def __call__(self, input):
+                    return self._client.embed(input, model="voyage-3", input_type="query").embeddings
+            return VoyageEF()
+        except ImportError:
+            pass
+    openai_key = os.environ.get("OPENAI_API_KEY")
+    if openai_key:
+        from chromadb.utils.embedding_functions import OpenAIEmbeddingFunction
+        return OpenAIEmbeddingFunction(api_key=openai_key, model_name="text-embedding-3-small")
+    raise RuntimeError("No VOYAGE_API_KEY or OPENAI_API_KEY found.")
+
+
+class ProtocolRetriever:
+    def __init__(self, chroma_dir="./chroma_db"):
+        self._client = chromadb.PersistentClient(path=chroma_dir)
+        self._ef = _get_embedding_fn()
+        try:
+            self._collection = self._client.get_collection(name=COLLECTDION_NAME, embedding_function=self._ef)
         except Exception as e:
-            logger.warning(f"ChromaDB unavailable: {e}")
-            return None
+            log.warning(f"ChromaDB not available: {e}")
+            self._collection = None
 
-    def _embed_query(self, text: str) -> Optional[list[float]]:
+    def retrieve(self, query, n_results=10, section_filter=None, latest_only=True, include_amendments=True):
+        if self._collection is None:
+            return []
+        where = {}
+        if section_filter:
+            where["section_label"] = {"$eq": section_filter}
+        if not include_amendments:
+            where["chunk_type"] = {"$ne": "amendment_rationale"}
         try:
-            from openai import OpenAI
-            client = OpenAI()
-            response = client.embeddings.create(
-                model="text-embedding-3-small",
-                input=text,
-            )
-            return response.data[0].embedding
+            results = self._collection.query(query_texts=[query], n_results=min(n_results*3, self._collection.count()), where=where or None, include=["documents","metadatas","distances"])
         except Exception as e:
-            logger.warning(f"Embedding failed: {e}")
-            return None
-
-    def query(self, study_inputs: StudyInput, n_results: int = 10) -> list[dict]:
-        collection = self._get_collection()
-        if collection is None:
+            log.error(f"Query failed: {e}")
             return []
+        chunks = self._parse_results(results)
+        if latest_only:
+            chunks = self._dedupe_latest(chunks)
+        return chunks[:n_results]
 
-        query_text = (
-            f"{study_inputs.drug_name} {study_inputs.indication} "
-            f"{study_inputs.study_type} {study_inputs.data_source or ''} "
-            f"{study_inputs.primary_outcome or ''} {study_inputs.population_description or ''}"
-        ).strip()
+    def retrieve_for_section(self, study_inputs_query, section, n_results=5):
+        """Section-specific retrieval - use this during protocol generation."""
+        return self.retrieve(query=study_inputs_query, n_results=n_results, section_filter=section, latest_only=True, include_amendments=False)
 
-        embedding = self._embed_query(query_text)
-        if embedding is None:
+    def retrieve_amendment_rationale(self, study_inputs_query, n_results=3):
+        """Retrieve amendment rationale chunks - use for limitations + study_design sections."""
+        if self._collection is None:
             return []
-
         try:
-            where = {}
-            if study_inputs.study_type and study_inputs.study_type != "other":
-                where["study_type"] = study_inputs.study_type
+            results = self._collection.query(query_texts=[study_inputs_query], n_results=n_results*L, where={"chunk_type": {"$eq": "amendment_rationale"}}, include=["documents","metadatas","distances"])
+        except Exception as e:
+            log.error(f"Amendment query failed: {e}")
+            return []
+        return self._parse_results(results)[:n_results]
 
-            results = collection.query(
-                query_embeddings=[embedding],
-                n_results=min(n_results, collection.count() or 1),
-                where=where if where else None,
-                include=["documents", "metadatas", "distances"],
-            )
-
-            chunks = []
-            for i, doc in enumerate(results["documents"][0]):
-                meta = results["metadatas"][0][i] if results["metadatas"] else {}
-                distance = results["distances"][0][i] if results["distances"] else 1.0
-                score = round(1 - distance, 4)
-                chunks.append(
-                    RetrievedChunk(
-                        chunk=doc,
-                        source_title=meta.get("title", "Unknown Protocol"),
-                        source_eu_pas=meta.get("eu_pas", ""),
-                        score=score,
-                        section=meta.get("section", ""),
-                    ).to_dict()
-                )
+    def _parse_results(self, results):
+        chunks = []
+        if not results["documents"] or not results["documents"][0]:
             return chunks
-        except Exception as e:
-            logger.error(f"ChromaDB query failed: {e}")
-            return []
+        for doc, meta, dist in zip(results["documents"][0], results["metadatas"][0], results["distances"][0]):
+            chunks.append(RetrievedChunk(text=doc, source_file=meta.get("source_file",""), study_id=meta.get("study_id",""), section_label=meta.get("section_label","unknown"), chunk_type=meta.get("chunk_type","section"), version_number=meta.get("version_number","unknown"), is_amendment=meta.get("is_amendment","false")=="true", amendment_order=int(meta.get("amendment_order",0)), score=1-dist, metadata=meta))
+        return sorted(chunks, key=lambda c: c.score, reverse=True)
 
-    def add_chunks(self, chunks_with_metadata: list[dict]) -> None:
-        collection = self._get_collection()
-        if collection is None:
-            return
-        documents = [c["text"] for c in chunks_with_metadata]
-        metadatas = [c["metadata"] for c in chunks_with_metadata]
-        ids = [c["id"] for c in chunks_with_metadata]
-        embeddings = [c["embedding"] for c in chunks_with_metadata]
-        collection.upsert(documents=documents, metadatas=metadatas, ids=ids, embeddings=embeddings)
+    def _dedupe_latest(self, chunks):
+        seen = {}
+        for c in chunks:
+            k = (c.study_id, c.section_label)
+            if k not in seen or c.amendment_order > seen[k].amendment_order:
+                seek[k] = c
+        return sorted(seen.values(), key=lambda c: c.score, reverse=True)
 
-    def get_collection_stats(self) -> dict:
-        collection = self._get_collection()
-        if collection is None:
-            return {"status": "unavailable", "count": 0}
-        return {"status": "ok", "count": collection.count()}
+    def get_stats(self):
+        if self._collection is None:
+            return {"status": "unavailable"}
+        return {"status": "ok", "total_chunks": self._collection.count(), "collection": COLLECTDION_NAME}
