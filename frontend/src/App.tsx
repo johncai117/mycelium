@@ -1,18 +1,28 @@
 import { useState } from 'react'
-import { Routes, Route, Link, useLocation } from 'react-router-dom'
+import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom'
 import { StudyList } from './pages/StudyList'
 import { StudySetup } from './pages/StudySetup'
 import { DataSourceSelector } from './pages/DataSourceSelector'
 import { ProtocolDraft } from './pages/ProtocolDraft'
 import { HowItWorks } from './pages/HowItWorks'
+import { Login } from './pages/Login'
+import { AuthGuard } from './components/AuthGuard'
 import { MOCK_MODE } from './api'
 import { OnboardingModal } from './components/shared/OnboardingModal'
+import { useAuth } from './hooks/useAuth'
 
 function Nav({ onTakeTour }: { onTakeTour: () => void }) {
   const location = useLocation()
+  const navigate = useNavigate()
+  const { user, signOut } = useAuth()
   const isDraft = location.pathname.includes('/draft')
 
   if (isDraft) return null  // Toolbar replaces nav on draft page
+
+  const handleSignOut = async () => {
+    await signOut()
+    navigate('/login')
+  }
 
   return (
     <header className="border-b border-slate-200 bg-white">
@@ -46,6 +56,19 @@ function Nav({ onTakeTour }: { onTakeTour: () => void }) {
           >
             Tour ✦
           </button>
+          {user && (
+            <>
+              <span className="text-slate-400 text-xs hidden md:block truncate max-w-[160px]">
+                {user.email}
+              </span>
+              <button
+                onClick={handleSignOut}
+                className="font-medium text-slate-500 hover:text-red-600 transition-colors"
+              >
+                Sign out
+              </button>
+            </>
+          )}
         </nav>
       </div>
     </header>
@@ -71,11 +94,47 @@ export default function App() {
       <MockBanner />
       <Nav onTakeTour={() => setShowOnboarding(true)} />
       <Routes>
-        <Route path="/" element={<StudyList onTakeTour={() => setShowOnboarding(true)} />} />
-        <Route path="/study/new" element={<StudySetup />} />
-        <Route path="/study/new/data-sources" element={<DataSourceSelector />} />
-        <Route path="/study/:id/draft" element={<ProtocolDraft />} />
-        <Route path="/how-it-works" element={<HowItWorks />} />
+        <Route path="/login" element={<Login />} />
+        <Route
+          path="/"
+          element={
+            <AuthGuard>
+              <StudyList onTakeTour={() => setShowOnboarding(true)} />
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/study/new"
+          element={
+            <AuthGuard>
+              <StudySetup />
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/study/new/data-sources"
+          element={
+            <AuthGuard>
+              <DataSourceSelector />
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/study/:id/draft"
+          element={
+            <AuthGuard>
+              <ProtocolDraft />
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/how-it-works"
+          element={
+            <AuthGuard>
+              <HowItWorks />
+            </AuthGuard>
+          }
+        />
       </Routes>
       {showOnboarding && <OnboardingModal onClose={() => setShowOnboarding(false)} />}
     </div>

@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { supabase } from '@/lib/supabase'
 import type {
   StudyInput,
   Protocol,
@@ -265,9 +266,15 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 })
 
-if (!MOCK_MODE && API_KEY) {
-  api.interceptors.request.use((config) => {
-    config.headers['Authorization'] = `Bearer ${API_KEY}`
+if (!MOCK_MODE) {
+  api.interceptors.request.use(async (config) => {
+    // Prefer Supabase session token; fall back to static API key for dev/demo
+    const { data: { session } } = await supabase.auth.getSession()
+    if (session?.access_token) {
+      config.headers['Authorization'] = `Bearer ${session.access_token}`
+    } else if (API_KEY) {
+      config.headers['Authorization'] = `Bearer ${API_KEY}`
+    }
     return config
   })
 }
